@@ -22,20 +22,23 @@ TEMPLATE = app
 SOURCES += main.cpp \
     echoserver.cpp \
     console.cpp \
-    sqlconnector.cpp \
+    orm/csqlconnector.cpp \
     cplanetmap.cpp \
     ccell.cpp \
     cplanetthread.cpp \
-    cplanetjson.cpp
+    cplanetjson.cpp \
+    orm/corm.cpp
 
 HEADERS += \
     echoserver.h \
     console.h \
-    sqlconnector.h \
+    orm/csqlconnector.h \
     cplanetmap.h \
     ccell.h \
     cplanetthread.h \
-    cplanetjson.h
+    cplanetjson.h \
+    orm/sql_objects/suser.h \
+    orm/corm.h
 
 unix:!macx: LIBS += -L$$PWD/../../sdk/mysql-connector/lib/ -lmysqlcppconn
 

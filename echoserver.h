@@ -9,7 +9,7 @@
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
-#include "sqlconnector.h"
+#include "orm/corm.h"
 #include "cplanetjson.h"
 
 class EchoServer : public QObject
@@ -39,7 +39,7 @@ private:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     bool m_debug;
-    SqlConnector m_sql;
+    COrm m_Orm;
 
     QString m_sValue;
 };

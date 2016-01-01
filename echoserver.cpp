@@ -10,7 +10,8 @@ EchoServer::EchoServer(quint16 port, bool debug, QObject *parent) :
     m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Echo Server"),
                                             QWebSocketServer::NonSecureMode, this)),
     m_clients(),
-    m_debug(debug)
+    m_debug(debug),
+    m_Orm(new CSqlConnector("tcp://127.0.0.1:3306", "root", "3421Dark"))
 {
     if (m_pWebSocketServer->listen(QHostAddress::Any, port)) {
         if (m_debug)
