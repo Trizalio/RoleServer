@@ -8,56 +8,79 @@
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
 
 void CreateTables()
 {
-
-    stmt = con->createStatement();
-    stmt->execute("DROP TABLE IF EXISTS test");
-    stmt->execute("CREATE TABLE test(id INT)");
-    delete stmt;
-
-    /* '?' is the supported placeholder syntax */
-    pstmt = con->prepareStatement("INSERT INTO test(id) VALUES (?)");
-    for (int i = 1; i <= 10; i++) {
-      pstmt->setInt(1, i);
-      pstmt->executeUpdate();
-    }
-    delete pstmt;
-}
-
-SqlConnector::SqlConnector()
-{
-
-    qDebug();
-    qDebug() << "Running 'SELECT 'Hello World!' AS _message'...";
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+    sql::ResultSet *res;
 
     try {
-      sql::Driver *driver;
-      sql::Connection *con;
-      sql::Statement *stmt;
-      sql::ResultSet *res;
+        driver = get_driver_instance();
+        con = driver->connect("tcp://127.0.0.1:3306", "root", "3421Dark");
+        con->setSchema("space_base");
 
-      /* Create a connection */
-      driver = get_driver_instance();
-      con = driver->connect("tcp://127.0.0.1:3306", "root", "3421Dark");
-      /* Connect to the MySQL test database */
-      con->setSchema("space_base");
+    //    stmt = con->createStatement();
+    //    stmt->execute("DROP TABLE IF EXISTS test");
+    //    stmt->execute("CREATE TABLE test(id INT)");
+    //    delete stmt;
 
-      stmt = con->createStatement();
-      res = stmt->executeQuery("SELECT 'Hello World!' AS _message");
-      while (res->next()) {
-        qDebug() << "\t... MySQL replies: ";
-        /* Access column data by alias or column name */
-        qDebug() << res->getString("_message").c_str();
-        qDebug() << "\t... MySQL says it again: ";
-        /* Access column fata by numeric offset, 1 is the first column */
-        qDebug() << res->getString(1).c_str();
-      }
-      delete res;
-      delete stmt;
-      delete con;
+    //    /* '?' is the supported placeholder syntax */
+    //    pstmt = con->prepareStatement("INSERT INTO test(id) VALUES (?)");
+    //    for (int i = 1; i <= 10; i++) {
+    //      pstmt->setInt(1, i);
+    //      pstmt->executeUpdate();
+    //    }
+    //    delete pstmt;
+        stmt = con->createStatement();
+        stmt->execute("DROP TABLE IF EXISTS `Users`;");
+        stmt->execute("CREATE TABLE `Users` (\
+                      `id` INTEGER NOT NULL AUTO_INCREMENT,\
+                      `name` VARCHAR(50) NOT NULL,\
+                      `surname` VARCHAR(50) NOT NULL,\
+                      `patronymic` VARCHAR(50) NOT NULL,\
+                      `birth_date` DATE NOT NULL,\
+                      `profession` VARCHAR(50) NOT NULL,\
+                      `description` MEDIUMTEXT NOT NULL,\
+                      PRIMARY KEY (`id`)\
+                    );");
+//        stmt->execute("CREATE TABLE `Users` (\
+//                      `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,\
+//                      `name` VARCHAR(50) NOT NULL,\
+//                      `surname` VARCHAR(50) NOT NULL,\
+//                      `patronymic` VARCHAR(50) NOT NULL,\
+//                      `birth_date` DATE NOT NULL,\
+//                      `profession` VARCHAR(50) NOT NULL,\
+//                      `discription` VARCHAR(50) NOT NULL,\
+//                      PRIMARY KEY (`id`)\
+//                    );");
 
+        /* '?' is the supported placeholder syntax */
+
+        //
+        // -- INSERT INTO `Users` (`id`,`name`,`surname`,`patronymic`,`birth_date`,`profession`,`description`) VALUES
+        // -- ('','','','','','','');
+        pstmt = con->prepareStatement("INSERT INTO `Users` \
+    (`name`,`surname`,`patronymic`,`birth_date`,`profession`,`description`) VALUES \
+    (?,'test_surname','test_patronymic','3015-11-12','test_profession','test_description');");
+        pstmt->setString(1, "test_name");
+        /*for (int i = 1; i <= 10; i++) {
+        }*/
+        pstmt->executeUpdate();
+        res = stmt->executeQuery("SELECT * FROM Users;");
+        while (res->next()) {
+            qDebug() << res->getString("name").c_str();
+            qDebug() << res->getString("surname").c_str();
+            qDebug() << res->getString("patronymic").c_str();
+            qDebug() << res->getString("birth_date").c_str();
+            qDebug() << res->getString("profession").c_str();
+            qDebug() << res->getString("description").c_str();
+        }
+        delete stmt;
+        delete pstmt;
     } catch (sql::SQLException &e) {
       qDebug() << "# ERR: SQLException in " << __FILE__;
       qDebug() << "(" << __FUNCTION__ << ") on line " << __LINE__;
@@ -65,8 +88,49 @@ SqlConnector::SqlConnector()
       qDebug() << " (MySQL error code: " << e.getErrorCode();
       qDebug() << ", SQLState: " << e.getSQLState().c_str() << " )";
     }
+}
 
-    qDebug();
+SqlConnector::SqlConnector()
+{
+    CreateTables();
+//    qDebug();
+//    qDebug() << "Running 'SELECT 'Hello World!' AS _message'...";
+
+//    try {
+//      sql::Driver *driver;
+//      sql::Connection *con;
+//      sql::Statement *stmt;
+//      sql::ResultSet *res;
+
+//      /* Create a connection */
+//      driver = get_driver_instance();
+//      con = driver->connect("tcp://127.0.0.1:3306", "root", "3421Dark");
+//      /* Connect to the MySQL test database */
+//      con->setSchema("space_base");
+
+//      stmt = con->createStatement();
+//      res = stmt->executeQuery("SELECT 'Hello World!' AS _message");
+//      while (res->next()) {
+//        qDebug() << "\t... MySQL replies: ";
+//        /* Access column data by alias or column name */
+//        qDebug() << res->getString("_message").c_str();
+//        qDebug() << "\t... MySQL says it again: ";
+//        /* Access column fata by numeric offset, 1 is the first column */
+//        qDebug() << res->getString(1).c_str();
+//      }
+//      delete res;
+//      delete stmt;
+//      delete con;
+
+//    } catch (sql::SQLException &e) {
+//      qDebug() << "# ERR: SQLException in " << __FILE__;
+//      qDebug() << "(" << __FUNCTION__ << ") on line " << __LINE__;
+//      qDebug() << "# ERR: " << e.what();
+//      qDebug() << " (MySQL error code: " << e.getErrorCode();
+//      qDebug() << ", SQLState: " << e.getSQLState().c_str() << " )";
+//    }
+
+//    qDebug();
 
     /*
 -- ---
