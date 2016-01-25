@@ -2,7 +2,7 @@
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QCommandLineOption>
 
-#include "echoserver.h"
+#include "server/echoserver.h"
 #include "console.h"
 #include "cplanetthread.h"
 
@@ -18,14 +18,30 @@ int main(int argc, char *argv[])
             QCoreApplication::translate("main", "Debug output [default: off]."));
     parser.addOption(dbgOption);
     QCommandLineOption portOption(QStringList() << "p" << "port",
-            QCoreApplication::translate("main", "Port for echoserver [default: 1234]."),
+            QCoreApplication::translate("main", "Port for echoserver [default: 1991]."),
             QCoreApplication::translate("main", "port"), QLatin1Literal("1991"));
     parser.addOption(portOption);
+    QCommandLineOption mysqlPortOption(QStringList() << "i" << "db_port",
+            QCoreApplication::translate("main", "Port for mysql [default: 3306]."),
+            QCoreApplication::translate("main", "db_port"), QLatin1Literal("3306"));
+    parser.addOption(mysqlPortOption);
+    QCommandLineOption mysqlLoginOption(QStringList() << "l" << "db_login",
+            QCoreApplication::translate("main", "Login for mysql [default: root]."),
+            QCoreApplication::translate("main", "db_login"), QLatin1Literal("root"));
+    parser.addOption(mysqlLoginOption);
+    QCommandLineOption mysqlPasswordOption(QStringList() << "s" << "db_pass",
+            QCoreApplication::translate("main", "Password for mysql [default: root]."),
+            QCoreApplication::translate("main", "db_pass"), QLatin1Literal("root"));
+    parser.addOption(mysqlPasswordOption);
     parser.process(a);
     bool debug = true;//parser.isSet(dbgOption);
-    int port = parser.value(portOption).toInt();
+    int nWebSocketPort = parser.value(portOption).toInt();
+    std::string sMysqlPort = parser.value(mysqlPortOption).toStdString();
+    std::string sMysqlLogin = parser.value(mysqlLoginOption).toStdString();
+    std::string sMysqlPass = parser.value(mysqlPasswordOption).toStdString();
 
-    EchoServer *server = new EchoServer(port, debug);
+    qDebug() << sMysqlPass.c_str();
+    EchoServer *server = new EchoServer(new CSqlConnector("tcp://127.0.0.1:" + sMysqlPort, sMysqlLogin, sMysqlPass), nWebSocketPort, debug);
     QObject::connect(server, &EchoServer::closed, &a, &QCoreApplication::quit);
 
     Console console;

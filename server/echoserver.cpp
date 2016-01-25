@@ -1,17 +1,15 @@
 #include "echoserver.h"
-#include "QtWebSockets/qwebsocketserver.h"
-#include "QtWebSockets/qwebsocket.h"
-#include <QtCore/QDebug>
 
 QT_USE_NAMESPACE
 
-EchoServer::EchoServer(quint16 port, bool debug, QObject *parent) :
+EchoServer::EchoServer(CSqlConnector *pSqlConnector, quint16 port, bool debug, QObject *parent) :
     QObject(parent),
+    m_ServerLogic(pSqlConnector),
     m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Echo Server"),
                                             QWebSocketServer::NonSecureMode, this)),
     m_clients(),
-    m_debug(debug),
-    m_Orm(new CSqlConnector("tcp://127.0.0.1:3306", "root", "3421Dark"))
+    m_debug(debug)
+//    m_Orm(new CSqlConnector("tcp://127.0.0.1:3306", "root", "3421Dark"))
 {
     if (m_pWebSocketServer->listen(QHostAddress::Any, port)) {
         if (m_debug)
@@ -77,9 +75,96 @@ void EchoServer::processTextMessage(QString message)
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     if (m_debug)
         qDebug() << QDateTime::currentMSecsSinceEpoch() << "Message received:" << (message.length() < 99 ? message : "");
-    if (pClient) {
+    if (pClient)
+    {
+        QString sCommand = message.section(" ", 0, 0);
+        QString sValue = message.section(" ", 1, 1);
+        int nId = 0;
+        if(m_ConnectionToPlayerId.count(pClient))
+        {
+            nId = m_ConnectionToPlayerId[pClient];
+        }
+        qDebug() << "Command:" << sCommand << "sValue:" << sValue;
 
-        if(message == "test")
+        if(sCommand == "post")
+        {
+            if(sValue == "login")
+            {
+                QString sLogin = message.section(" ", 2, 2);
+                QString sPasswordHash = message.section(" ", 3, 3);
+                int nNewId = m_ServerLogic.login(sLogin.toStdString(), sPasswordHash.toStdString());
+                if(nNewId)
+                {
+                    m_ConnectionToPlayerId[pClient] = nNewId;
+                    pClient->sendTextMessage("login ok:");
+                    qDebug() << "login ok:" << nNewId;
+                }
+                else
+                {
+                    pClient->sendTextMessage("login fail:");
+                    qDebug() << "login fail";
+                }
+            }
+            else if(sValue == "logout")
+            {
+                m_ConnectionToPlayerId[pClient] = 0;
+                pClient->sendTextMessage("logout ok:");
+            }
+        }
+        else if(sCommand == "get")
+        {
+            if(sValue == "player")
+            {
+                if(nId > 0)
+                {
+                    QByteArray aJson = m_ServerLogic.getPlayerData(nId);
+                    QByteArray aAnswer = "player data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("no player:");
+                    qDebug() << "unauthorized access to player data";
+                }
+            }
+            if(sValue == "user")
+            {
+///                allowed while testing
+///                if(nId > 0)
+                if(true)
+                {
+                    int nTargetId = message.section(" ", 2, 2).toInt();
+                    QByteArray aJson = m_ServerLogic.getUserData(nTargetId);
+                    QByteArray aAnswer = "user data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("auth required:");
+                    qDebug() << "unauthorized access to user data";
+                }
+            }
+            if(sValue == "people")
+            {
+///                allowed while testing
+///                if(nId > 0)
+                if(true)
+                {
+                    QByteArray aJson = m_ServerLogic.getPeopleData();
+                    QByteArray aAnswer = "people data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("auth required:");
+                    qDebug() << "unauthorized access to people";
+                }
+            }
+        }
+        /*if(message == "test")
         {
             pClient->sendTextMessage("test passed");
         }
@@ -122,7 +207,7 @@ void EchoServer::processTextMessage(QString message)
             {
                 m_sValue.remove(i, 1);
             }
-        }
+        }*/
         //pClient->sendTextMessage("message");
     }
 }
@@ -140,6 +225,10 @@ void EchoServer::processBinaryMessage(QByteArray message)
 void EchoServer::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+    if(m_ConnectionToPlayerId.count(pClient))
+    {
+        m_ConnectionToPlayerId[pClient] = 0;
+    }
     if (m_debug)
         qDebug() << "socketDisconnected:" << pClient;
     if (pClient) {

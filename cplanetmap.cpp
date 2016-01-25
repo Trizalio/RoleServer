@@ -14,7 +14,8 @@ CPlanetMap::CPlanetMap()
     initShifting();
 //    qDebug() << "lanbda start";
     forEachCell([](CCell* pCell, double fX, double fY){
-        pCell->nTemperature = fX+fY;
+        pCell->nTemperature = (MAP_WIDTH/2 - abs(fX - MAP_WIDTH/2))*1 + (MAP_HEIGHT/2 - abs(fY - MAP_HEIGHT/2))*1;
+//        qDebug() << fY << (MAP_HEIGHT/2);
     });
     forEachCell([](CCell* pCell, double fX, double fY){
         pCell->nHeight = int(fX+fY) % int((MAP_WIDTH + MAP_HEIGHT) / 10);

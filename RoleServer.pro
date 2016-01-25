@@ -20,17 +20,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    echoserver.cpp \
+    server/echoserver.cpp \
     console.cpp \
     orm/csqlconnector.cpp \
     cplanetmap.cpp \
     ccell.cpp \
     cplanetthread.cpp \
     cplanetjson.cpp \
-    orm/corm.cpp
+    orm/corm.cpp \
+    server/cserverlogic.cpp \
+    orm/aggregation_objects/cuser.cpp
 
 HEADERS += \
-    echoserver.h \
+    server/echoserver.h \
     console.h \
     orm/csqlconnector.h \
     cplanetmap.h \
@@ -38,7 +40,16 @@ HEADERS += \
     cplanetthread.h \
     cplanetjson.h \
     orm/sql_objects/suser.h \
-    orm/corm.h
+    orm/corm.h \
+    orm/sql_objects/splayer.h \
+    orm/sql_objects/scredential.h \
+    orm/sql_objects/smessage.h \
+    server/cserverlogic.h \
+    orm/sql_objects/sdialogue.h \
+    orm/aggregation_objects/sdialogue.h \
+    orm/sql_objects/sgroup.h \
+    orm/sql_objects/srole.h \
+    orm/aggregation_objects/cuser.h
 
 unix:!macx: LIBS += -L$$PWD/../../sdk/mysql-connector/lib/ -lmysqlcppconn
 
