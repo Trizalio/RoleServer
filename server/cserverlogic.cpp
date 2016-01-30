@@ -35,57 +35,79 @@ QByteArray CServerLogic::getPlayerData(int nId)
     return aJson;
 }
 
-QByteArray CServerLogic::getUserData(int nId)
+QByteArray CServerLogic::getUserDataByWatcher(int nId, int nWatcherId)
 {
     qDebug() << __FUNCTION__;
-    CUser User = m_Orm.getUserInfoById(nId);
-
-//    QJsonObject jUser;
-//    jUser.insert("Id", User.m_nId);
-//    jUser.insert("Name", User.m_sName.c_str());
-//    jUser.insert("Surname", User.m_sSurname.c_str());
-//    jUser.insert("Patronymic", User.m_sPatronymic.c_str());
-//    jUser.insert("BirthDate", User.m_sBirthDate.c_str());
-//    jUser.insert("Profession", User.m_sProfession.c_str());
-//    jUser.insert("Description", User.m_sDescription.c_str());
-
-//    QJsonDocument jDocument;
-//    jDocument.setObject(jUser);
-//    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
-
-//    return getJsonFromUser(User);
+    CUser User = m_Orm.getUserInfoById(nId, nWatcherId);
     return User.getJson();
 }
 
-QByteArray CServerLogic::getPeopleData()
+QByteArray CServerLogic::getUsersAllData()
 {
     qDebug() << __FUNCTION__;
     std::vector<SUser> Users = m_Orm.selectUserAll();
 
-
-    QJsonArray jMapArray;
-
+    QJsonArray jArray;
     for(size_t i = 0; i < Users.size(); ++i)
     {
-
-        QJsonValue jRowValue(QString(getJsonFromUser(Users[i])));
-        jMapArray.append(jRowValue);
+        QJsonValue jValue(Users[i].getJsonObject());
+        jArray.append(jValue);
     }
 
-//    QJsonValue jMapValue(jMapArray);
-//    QJsonValue jWidthValue(pMap.getWidth());
-//    QJsonValue jHeightValue(pMap.getHeight());
-
-//    QJsonObject jMainObject;
-//    jMainObject.insert("Map", jMapValue);
-//    jMainObject.insert("Width", jWidthValue);
-//    jMainObject.insert("Height", jHeightValue);
-
     QJsonDocument jDocument;
-    jDocument.setArray(jMapArray);
+    jDocument.setArray(jArray);
     QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
 
-//    QByteArray aJson;
+    return aJson;
+}
+
+QByteArray CServerLogic::getProjectDataByWatcher(int nId, int nWatcherId)
+{
+    qDebug() << __FUNCTION__;
+    CGroup Group = m_Orm.getGroupInfoByIdByWatcher(nId, nWatcherId);
+    return Group.getJson();
+}
+
+QByteArray CServerLogic::getProjectsAllData()
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> aGroups = m_Orm.selectGroupsAll();
+    qDebug() << aGroups.size();
+
+
+    QJsonArray jArray;
+    for(size_t i = 0; i < aGroups.size(); ++i)
+    {
+        QJsonValue jValue(aGroups[i].getJsonObject());
+        jArray.append(jValue);
+    }
+
+    QJsonDocument jDocument;
+    jDocument.setArray(jArray);
+    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
+    qDebug() << aJson;
+
+    return aJson;
+}
+QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> aGroups = m_Orm.selectAllGroupsVisibleByUser(nId);
+    qDebug() << aGroups.size();
+
+
+    QJsonArray jArray;
+    for(size_t i = 0; i < aGroups.size(); ++i)
+    {
+        QJsonValue jValue(aGroups[i].getJsonObject());
+        jArray.append(jValue);
+    }
+
+    QJsonDocument jDocument;
+    jDocument.setArray(jArray);
+    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
+    qDebug() << aJson;
+
     return aJson;
 }
 

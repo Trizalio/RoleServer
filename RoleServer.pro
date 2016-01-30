@@ -29,7 +29,11 @@ SOURCES += main.cpp \
     cplanetjson.cpp \
     orm/corm.cpp \
     server/cserverlogic.cpp \
-    orm/aggregation_objects/cuser.cpp
+    orm/aggregation_objects/cuser.cpp \
+    orm/aggregation_objects/cgroup.cpp \
+    orm/sql_objects/sgroup.cpp \
+    orm/sql_objects/suser.cpp \
+    orm/sql_objects/cjsonserializable.cpp
 
 HEADERS += \
     server/echoserver.h \
@@ -49,7 +53,9 @@ HEADERS += \
     orm/aggregation_objects/sdialogue.h \
     orm/sql_objects/sgroup.h \
     orm/sql_objects/srole.h \
-    orm/aggregation_objects/cuser.h
+    orm/aggregation_objects/cuser.h \
+    orm/aggregation_objects/cgroup.h \
+    orm/sql_objects/cjsonserializable.h
 
 unix:!macx: LIBS += -L$$PWD/../../sdk/mysql-connector/lib/ -lmysqlcppconn
 

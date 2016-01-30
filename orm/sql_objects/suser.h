@@ -1,7 +1,7 @@
 #ifndef SUSER_H
 #define SUSER_H
 
-#include <string>
+#include "cjsonserializable.h"
 
 #define USER_DROP_SCRIPT "DROP TABLE IF EXISTS `Users`;"
 #define USER_CREATE_SCRIPT "CREATE TABLE `Users` (\
@@ -17,38 +17,27 @@ PRIMARY KEY (`id`)\
 
 #define USER_UTF8_SCRIPT "ALTER TABLE `Users` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;"
 
-struct SUser
+struct SUser : public CJsonSerializable
 {
 public:
-    SUser(){}
+    SUser();
+
     SUser(std::string sName,
             std::string sSurname,
             std::string sPatronymic,
             std::string sBirthDate,
             std::string sProfession,
-            std::string sDescription):
-        m_sName(sName),
-        m_sSurname(sSurname),
-        m_sPatronymic(sPatronymic),
-        m_sBirthDate(sBirthDate),
-        m_sProfession(sProfession),
-        m_sDescription(sDescription)
-    {}
+            std::string sDescription);
+
     SUser(int nId,
             std::string sName,
             std::string sSurname,
             std::string sPatronymic,
             std::string sBirthDate,
             std::string sProfession,
-            std::string sDescription):
-        m_nId(nId),
-        m_sName(sName),
-        m_sSurname(sSurname),
-        m_sPatronymic(sPatronymic),
-        m_sBirthDate(sBirthDate),
-        m_sProfession(sProfession),
-        m_sDescription(sDescription)
-    {}
+            std::string sDescription);
+
+    QJsonObject getJsonObject() override;
 
     int m_nId = 0;
     std::string m_sName;

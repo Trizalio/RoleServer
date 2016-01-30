@@ -4,11 +4,6 @@
 #include <iostream>
 #include <stdio.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-
 #include <orm/corm.h>
 
 class CServerLogic
@@ -18,8 +13,13 @@ public:
 
     int login(std::string sLogin, std::string sPassword);
     QByteArray getPlayerData(int nId);
-    QByteArray getUserData(int nId);
-    QByteArray getPeopleData();
+
+    QByteArray getUserDataByWatcher(int nId, int nWatcherId);
+    QByteArray getUsersAllData();
+
+    QByteArray getProjectDataByWatcher(int nId, int nWatcherId);
+    QByteArray getProjectsDataByWatcher(int nId);
+    QByteArray getProjectsAllData();
 
 private:
     QByteArray getJsonFromUser(SUser& User);

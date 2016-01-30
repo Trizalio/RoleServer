@@ -19,6 +19,7 @@ class CSqlConnector
 {
 public:
     CSqlConnector(std::string sHost, std::string sLogin, std::string sPassword);
+    ~CSqlConnector();
     const CSqlConnector& operator=( const CSqlConnector& );
 
     void execute(std::string sQuery);

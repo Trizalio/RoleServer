@@ -10,6 +10,7 @@
 #include "orm/sql_objects/srole.h"
 #include "orm/aggregation_objects/sdialogue.h"
 #include "orm/aggregation_objects/cuser.h"
+#include "orm/aggregation_objects/cgroup.h"
 
 #define DATABASE_UTF8_SCRIPT std::string("ALTER DATABASE ") + DATABASE_NAME + std::string(" CHARACTER SET utf8 COLLATE utf8_general_ci")
 
@@ -29,6 +30,7 @@ public:
     SPlayer findPlayerById(int nId);
     SGroup findGroupById(int nId);
     std::vector<SRole> findRolesByUserId(int nUserId);
+    std::vector<SRole> findRolesByGroupId(int nGroupId);
 //    void
 
 
@@ -40,12 +42,22 @@ public:
     ///////////////////////////
 
     std::vector<SDialogue> selectUserDialogues();
-    CUser getUserInfoById(int nId);
+    CUser getUserInfoById(int nId, int nWatcherId);
+    CGroup getGroupInfoByIdByWatcher(int nId, int nWatcherId);
+    CGroup getGroupInfoById(int nId);
+
+    /////////////
+    /// other ///
+    /////////////
+
+    std::vector<SGroup> selectAllGroupsVisibleByUser(int nId);
 
     ////////////
     /// junk ///
     ////////////
 
+    std::vector<CGroup> selectAllGroupsInfoVisibleByUser(int nId);
+    std::vector<SGroup> selectGroupsAll();
     std::vector<SUser> selectUserAll();
     SPlayer selectPlayerBy(std::string sName, std::string sSurname, std::string sPatronymic,
                            std::string sNick, std::string sBirthDate, std::string sQuenta);

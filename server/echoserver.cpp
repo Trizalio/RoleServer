@@ -135,7 +135,7 @@ void EchoServer::processTextMessage(QString message)
                 if(true)
                 {
                     int nTargetId = message.section(" ", 2, 2).toInt();
-                    QByteArray aJson = m_ServerLogic.getUserData(nTargetId);
+                    QByteArray aJson = m_ServerLogic.getUserDataByWatcher(nTargetId, nId);
                     QByteArray aAnswer = "user data:";
                     aAnswer.append(aJson);
                     pClient->sendTextMessage(aAnswer);
@@ -152,7 +152,7 @@ void EchoServer::processTextMessage(QString message)
 ///                if(nId > 0)
                 if(true)
                 {
-                    QByteArray aJson = m_ServerLogic.getPeopleData();
+                    QByteArray aJson = m_ServerLogic.getUsersAllData();
                     QByteArray aAnswer = "people data:";
                     aAnswer.append(aJson);
                     pClient->sendTextMessage(aAnswer);
@@ -161,6 +161,44 @@ void EchoServer::processTextMessage(QString message)
                 {
                     pClient->sendTextMessage("auth required:");
                     qDebug() << "unauthorized access to people";
+                }
+            }
+            if(sValue == "project")
+            {
+///                allowed while testing
+///                if(nId > 0)
+                if(true)
+                {
+                    int nTargetId = message.section(" ", 2, 2).toInt();
+                    /// TODO access check
+                    QByteArray aJson = m_ServerLogic.getProjectDataByWatcher(nTargetId, nId);
+                    QByteArray aAnswer = "project data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("auth required:");
+                    qDebug() << "unauthorized access to user data";
+                }
+            }
+            if(sValue == "projects")
+            {
+///                allowed while testing
+///                if(nId > 0)
+                if(true)
+                {
+                    /// TODO change for getProjectsDataForUser(...);
+                    QByteArray aJson = m_ServerLogic.getProjectsDataByWatcher(nId);
+//                    QByteArray aJson = m_ServerLogic.getProjectsAllData();
+                    QByteArray aAnswer = "projects data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("auth required:");
+                    qDebug() << "unauthorized access to projects";
                 }
             }
         }

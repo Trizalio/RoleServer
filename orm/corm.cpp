@@ -14,6 +14,8 @@ COrm::COrm(CSqlConnector *pSqlConnector):
                "Начальник по техническому обеспечению","Пожалуйста, подавая заявки на получение образцов прикрепляйте план работ!");
     SUser User4("Ариадна","Лебедева","Вечеславовна","2077-06-07",
                "Главный программист","Рада помочь!");
+    SUser User5("Ильин","Илья","Вадимович","2070-10-13",
+                "Уборщик","По помытому не ходите!");
     SPlayer Player1(1, "Парамон", "Щербаков", "Кириллович", "Mr. White",
                    "1974-08-11", "Квента начальника базы");
     SPlayer Player2(2, "Апполинарий", "Холодков", "Егорович", "Mr. Orange",
@@ -28,15 +30,18 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     SCredential Credential4(4, "4", "4");
     SGroup Group1(0, "Управление базы", "Принимает наиболее важные решения в жизни базы", SGroup::LAB);
     SGroup Group2(1, "Отдел Технического обеспечения", "Обеспечивает нормальную работу техноческой составляющей базы", SGroup::LAB);
+    SGroup Group3(0, "Нарушение системы жизнеобесспечения", "Необходимо повредить регенератор кислорода, воды, контроллер давления или систему поглощения углекислого газа", SGroup::HIDDEN);
     SRole Role1(1, 1, true);
     SRole Role2(2, 1, false);
     SRole Role3(3, 2, true);
     SRole Role4(4, 2, false);
+    SRole Role5(4, 3, true);
     qDebug() << "insert";
     insertUser(User1);
     insertUser(User2);
     insertUser(User3);
     insertUser(User4);
+    insertUser(User5);
     qDebug() << "User";
     insertPlayer(Player1);
     insertPlayer(Player2);
@@ -50,20 +55,22 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     qDebug() << "Credential";
     insertGroup(Group1);
     insertGroup(Group2);
+    insertGroup(Group3);
     qDebug() << "Group";
     insertRole(Role1);
     insertRole(Role2);
     insertRole(Role3);
     insertRole(Role4);
-    qDebug() << "Group";
-    std::vector<SUser> res = selectUserAll();
+    insertRole(Role5);
+    qDebug() << "Fin";
+    /*std::vector<SUser> res = selectUserAll();
     for(size_t i = 0; i < res.size(); ++i)
     {
         qDebug() << res.at(i).m_nId;
         qDebug() << res.at(i).m_nId << res.at(i).m_sName.c_str() << res.at(i).m_sSurname.c_str() <<
                     res.at(i).m_sPatronymic.c_str() << res.at(i).m_sBirthDate.c_str() <<
                     res.at(i).m_sProfession.c_str() << res.at(i).m_sDescription.c_str();
-    }
+    }*/
 }
 
 void COrm::insertUser(SUser& User)
@@ -144,27 +151,7 @@ void COrm::insertGroup(SGroup &Group)
     }
     pPreparedStatement->setString(i++, Group.m_sName);
     pPreparedStatement->setString(i++, Group.m_sDescription);
-    if(Group.m_eType == SGroup::GROUP)
-    {
-        pPreparedStatement->setString(i++, "Group");
-    }
-    else if(Group.m_eType == SGroup::PROJECT)
-    {
-        pPreparedStatement->setString(i++, "Project");
-    }
-    else if(Group.m_eType == SGroup::TASK)
-    {
-        pPreparedStatement->setString(i++, "Task");
-    }
-    else if(Group.m_eType == SGroup::LAB)
-    {
-        pPreparedStatement->setString(i++, "Lab");
-    }
-    else
-    {
-        qDebug() << "ERROR:" << "Group type enums value";
-        return;
-    }
+    pPreparedStatement->setString(i++, SGroup::typeToString(Group.m_eType));
     pPreparedStatement->executeUpdate();
     delete pPreparedStatement;
 }
@@ -206,15 +193,179 @@ std::vector<SUser> COrm::selectUserAll()
     return Result;
 }
 
-CUser COrm::getUserInfoById(int nId)
+CUser COrm::getUserInfoById(int nId, int nWatcherId)
 {
     CUser User = CUser(findUserById(nId));
+    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherId);
     std::vector<SRole> UserRoles = findRolesByUserId(nId);
     for(size_t i = 0; i < UserRoles.size(); ++i)
     {
-        User.addGroup(findGroupById(UserRoles.at(i).m_nGroupId));
+        int nCurRoleGroupId = UserRoles.at(i).m_nGroupId;
+        for(size_t j = 0; j < aGroupsVisibleByWatcher.size(); ++j)
+        {
+            if(aGroupsVisibleByWatcher.at(j).m_nId == nCurRoleGroupId)
+            {
+                User.addGroup(findGroupById(nCurRoleGroupId));
+                break;
+            }
+        }
     }
     return User;
+}
+
+CGroup COrm::getGroupInfoByIdByWatcher(int nId, int nWatcherId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherId);
+    for(size_t j = 0; j < aGroupsVisibleByWatcher.size(); ++j)
+    {
+//        qDebug() << (aGroupsVisibleByWatcher.at(j).m_nId << nId;
+        if(aGroupsVisibleByWatcher.at(j).m_nId == nId)
+        {
+            return getGroupInfoById(nId);
+        }
+    }
+    return CGroup(SGroup());
+}
+
+CGroup COrm::getGroupInfoById(int nId)
+{
+    CGroup Group = CGroup(findGroupById(nId));
+    std::vector<SRole> UserRoles = findRolesByGroupId(nId);
+    for(size_t i = 0; i < UserRoles.size(); ++i)
+    {
+        Group.addUser(findUserById(UserRoles.at(i).m_nUserId));
+    }
+    return Group;
+}
+
+std::vector<SGroup> COrm::selectAllGroupsVisibleByUser(int nId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> Result;
+
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select ChildGroups.id, \
+ChildGroups.fk_Groups_id_parent, \
+ChildGroups.name, \
+ChildGroups.description, \
+ChildGroups.type \
+from Groups as ChildGroups \
+join Groups \
+on Groups.id = ChildGroups.fk_Groups_id_parent \
+join Roles \
+on Groups.id = Roles.fk_Groups_id \
+join Users \
+on Users.id = Roles.fk_Users_id \
+where Users.id = ? \
+and ChildGroups.type != 'hidden'\
+\
+UNION \
+\
+select Groups.id, \
+Groups.fk_Groups_id_parent, \
+Groups.name, \
+Groups.description, \
+Groups.type \
+from Groups \
+join Roles \
+on Groups.id = Roles.fk_Groups_id \
+join Users \
+on Users.id = Roles.fk_Users_id \
+where Users.id = ? \
+\
+UNION \
+\
+select Groups.id, \
+Groups.fk_Groups_id_parent, \
+Groups.name, \
+Groups.description, \
+Groups.type \
+from Groups \
+where Groups.type = 'lab'\
+or Groups.type = 'public';");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nId);
+    pPreparedStatement->setInt(i++, nId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result.push_back(SGroup(pResult->getInt("id"),
+            pResult->getInt("fk_Groups_id_parent"),
+            pResult->getString("name").c_str(),
+            pResult->getString("description").c_str(),
+            pResult->getString("type").c_str()));
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+std::vector<CGroup> COrm::selectAllGroupsInfoVisibleByUser(int nId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<CGroup> Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select ChildGroups.id \
+from Groups as ChildGroups \
+join Groups \
+on Groups.id = ChildGroups.fk_Groups_id_parent \
+join Roles \
+on Groups.id = Roles.fk_Groups_id \
+join Users \
+on Users.id = Roles.fk_Users_id \
+where Users.id = ? \
+and ChildGroups.type != 'hidden'\
+\
+UNION \
+\
+select Groups.id \
+from Groups \
+join Roles \
+on Groups.id = Roles.fk_Groups_id \
+join Users \
+on Users.id = Roles.fk_Users_id \
+where Users.id = ? \
+\
+UNION \
+\
+select Groups.id \
+from Groups \
+where Groups.type = 'lab'\
+or Groups.type = 'public';");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nId);
+    pPreparedStatement->setInt(i++, nId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result.push_back(getGroupInfoById(pResult->getInt("id")));
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+std::vector<SGroup> COrm::selectGroupsAll()
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select Groups.id, \
+Groups.fk_Groups_id_parent, \
+Groups.name, \
+Groups.description, \
+Groups.type \
+from Groups;");
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result.push_back(SGroup(pResult->getInt("id"),
+            pResult->getInt("fk_Groups_id_parent"),
+            pResult->getString("name").c_str(),
+            pResult->getString("description").c_str(),
+            pResult->getString("type").c_str()));
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
 }
 
 SUser COrm::findUserById(int nId)
@@ -244,6 +395,7 @@ where Users.id = ?;");
             pResult->getString("description").c_str());
     }
     delete pResult;
+    delete pPreparedStatement;
     return Result;
 }
 
@@ -281,6 +433,7 @@ and Credentials.passwordHash = ?;");
             pResult->getString("quenta").c_str());
     }
     delete pResult;
+    delete pPreparedStatement;
     return Result;
 }
 
@@ -313,6 +466,7 @@ where Players.id = ?;");
             pResult->getString("quenta").c_str());
     }
     delete pResult;
+    delete pPreparedStatement;
     return Result;
 }
 
@@ -339,6 +493,7 @@ where Groups.id = ?;");
             pResult->getString("type").c_str());
     }
     delete pResult;
+    delete pPreparedStatement;
     return Result;
 }
 
@@ -363,6 +518,32 @@ where fk_Users_id = ?;");
             (bool)(pResult->getInt("owner"))));
     }
     delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+std::vector<SRole> COrm::findRolesByGroupId(int nGroupId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SRole> Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select id, \
+fk_Users_id, \
+fk_Groups_id, \
+owner \
+from Roles \
+where fk_Groups_id = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nGroupId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result.push_back(SRole(pResult->getInt("id"),
+            pResult->getInt("fk_Users_id"),
+            pResult->getInt("fk_Groups_id"),
+            (bool)(pResult->getInt("owner"))));
+    }
+    delete pResult;
+    delete pPreparedStatement;
     return Result;
 }
 
