@@ -201,6 +201,25 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to projects";
                 }
             }
+            if(sValue == "news")
+            {
+///                allowed while testing
+///                if(nId > 0)
+                if(true)
+                {
+                    /// TODO change for getProjectsDataForUser(...);
+                    QByteArray aJson = m_ServerLogic.getNewsAllByWatcher(nId);
+//                    QByteArray aJson = m_ServerLogic.getProjectsAllData();
+                    QByteArray aAnswer = "news data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("auth required:");
+                    qDebug() << "unauthorized access to projects";
+                }
+            }
         }
         /*if(message == "test")
         {

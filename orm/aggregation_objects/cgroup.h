@@ -17,8 +17,6 @@ public:
 private:
     std::vector<SUser> m_aUsers;
     SGroup m_Group;
-
-
 };
 
 #endif // CGROUP_H

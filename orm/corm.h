@@ -8,9 +8,11 @@
 #include "orm/sql_objects/smessage.h"
 #include "orm/sql_objects/sgroup.h"
 #include "orm/sql_objects/srole.h"
+#include "orm/sql_objects/snews.h"
 #include "orm/aggregation_objects/sdialogue.h"
 #include "orm/aggregation_objects/cuser.h"
 #include "orm/aggregation_objects/cgroup.h"
+#include "orm/aggregation_objects/cnews.h"
 
 #define DATABASE_UTF8_SCRIPT std::string("ALTER DATABASE ") + DATABASE_NAME + std::string(" CHARACTER SET utf8 COLLATE utf8_general_ci")
 
@@ -25,6 +27,7 @@ public:
     void insertMessage(SMessage& Message);
     void insertGroup(SGroup& Group);
     void insertRole(SRole& Role);
+    void insertNews(SNews& News);
 
     SUser findUserById(int nId);
     SPlayer findPlayerById(int nId);
@@ -45,6 +48,7 @@ public:
     CUser getUserInfoById(int nId, int nWatcherId);
     CGroup getGroupInfoByIdByWatcher(int nId, int nWatcherId);
     CGroup getGroupInfoById(int nId);
+    std::vector<CNews> selectNewsAllVisibleByUser(int nWatcherId);
 
     /////////////
     /// other ///
@@ -52,11 +56,12 @@ public:
 
     std::vector<SGroup> selectAllGroupsVisibleByUser(int nId);
 
+
     ////////////
     /// junk ///
     ////////////
 
-    std::vector<CGroup> selectAllGroupsInfoVisibleByUser(int nId);
+//    std::vector<CGroup> selectAllGroupsInfoVisibleByUser(int nId);
     std::vector<SGroup> selectGroupsAll();
     std::vector<SUser> selectUserAll();
     SPlayer selectPlayerBy(std::string sName, std::string sSurname, std::string sPatronymic,

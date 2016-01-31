@@ -72,7 +72,6 @@ QByteArray CServerLogic::getProjectsAllData()
 {
     qDebug() << __FUNCTION__;
     std::vector<SGroup> aGroups = m_Orm.selectGroupsAll();
-    qDebug() << aGroups.size();
 
 
     QJsonArray jArray;
@@ -85,10 +84,29 @@ QByteArray CServerLogic::getProjectsAllData()
     QJsonDocument jDocument;
     jDocument.setArray(jArray);
     QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
-    qDebug() << aJson;
 
     return aJson;
 }
+
+QByteArray CServerLogic::getNewsAllByWatcher(int nId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<CNews> aNews = m_Orm.selectNewsAllVisibleByUser(nId);
+
+    QJsonArray jArray;
+    for(size_t i = 0; i < aNews.size(); ++i)
+    {
+        QJsonValue jValue(aNews[i].getJsonObject());
+        jArray.append(jValue);
+    }
+
+    QJsonDocument jDocument;
+    jDocument.setArray(jArray);
+    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
+
+    return aJson;
+}
+
 QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
 {
     qDebug() << __FUNCTION__;
@@ -106,7 +124,6 @@ QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
     QJsonDocument jDocument;
     jDocument.setArray(jArray);
     QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
-    qDebug() << aJson;
 
     return aJson;
 }

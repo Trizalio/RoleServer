@@ -13,7 +13,6 @@ PRIMARY KEY (`id`), \
 KEY (`fk_Groups_id`), \
 KEY (`fk_Users_id`) \
 );"
-
 #define ROLE_CONNECT_SCRIPT_1 "ALTER TABLE `Roles` ADD FOREIGN KEY (fk_Users_id) REFERENCES `Users` (`id`);"
 #define ROLE_CONNECT_SCRIPT_2 "ALTER TABLE `Roles` ADD FOREIGN KEY (fk_Groups_id) REFERENCES `Groups` (`id`);"
 #define ROLE_UTF8_SCRIPT "ALTER TABLE `Roles` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;"

@@ -36,6 +36,10 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     SRole Role3(3, 2, true);
     SRole Role4(4, 2, false);
     SRole Role5(4, 3, true);
+    SNews News1(1, "2105-02-13", "Поздравляю всех с началом работ на станции", "Я очень рад видеть здесь такое множество лучших умов человечества, сплочённых единой целью. Я не сомневаюсь, что мы справимся с нашей задачей и откроем для человечества эпоху терраформирования.", false, true);
+    SNews News2(3, "2107-03-27", "Потеряшки", "Уважаемый коллега, забывший эротический журнал на ремонтной консоли в ангаре дронов, найдись! Твоя вещь находится у начальника технической службы. ", false, true);
+    SNews News3(4, "2107-03-27", "Обмен", "Обменяю полное собрание сочинений Джорджа Мартина, 76 томов, 23 гигабайта. Комиксы и интерактивки не предлагать!", false, false);
+    SNews News4(5, "2109-11-07", "Пора действовать", "Время уходит, каждый день снижает шанс нашей миссии. Поторопитсь.", true, true);
     qDebug() << "insert";
     insertUser(User1);
     insertUser(User2);
@@ -62,7 +66,13 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     insertRole(Role3);
     insertRole(Role4);
     insertRole(Role5);
+    qDebug() << "News";
+    insertNews(News1);
+    insertNews(News2);
+    insertNews(News3);
+    insertNews(News4);
     qDebug() << "Fin";
+//    selectNewsAllVisibleByUser(1);
     /*std::vector<SUser> res = selectUserAll();
     for(size_t i = 0; i < res.size(); ++i)
     {
@@ -165,6 +175,21 @@ void COrm::insertRole(SRole &Role)
     pPreparedStatement->setInt(i++, Role.m_nUserId);
     pPreparedStatement->setInt(i++, Role.m_nGroupId);
     pPreparedStatement->setInt(i++, (int)(Role.m_bOwner));
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+void COrm::insertNews(SNews &News)
+{
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `News` \
+(`fk_Roles_id`,`created`,`subject`,`text`,`anonymously`,`shared`) VALUES \
+(?,?,?,?,?,?);");
+    pPreparedStatement->setInt(1, News.m_nRoleId);
+    pPreparedStatement->setString(2, News.m_sCreatedDatetime);
+    pPreparedStatement->setString(3, News.m_sSubject);
+    pPreparedStatement->setString(4, News.m_sText);
+    pPreparedStatement->setInt(5, (int)News.m_bAnonymously);
+    pPreparedStatement->setInt(6, (int)News.m_bShared);
     pPreparedStatement->executeUpdate();
     delete pPreparedStatement;
 }
@@ -300,7 +325,57 @@ or Groups.type = 'public';");
     return Result;
 }
 
-std::vector<CGroup> COrm::selectAllGroupsInfoVisibleByUser(int nId)
+std::vector<CNews> COrm::selectNewsAllVisibleByUser(int nWatcherId)
+{
+    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherId);
+    std::vector<CNews> Result;
+    sql::ResultSet* pResult = m_pCSqlConnector->executeResult("select \
+Roles.fk_Groups_id, \
+Roles.fk_Users_id, \
+News.id, \
+News.created, \
+News.subject, \
+News.text, \
+News.anonymously, \
+News.fk_Roles_id, \
+News.shared \
+from News \
+join Roles \
+on News.fk_Roles_id = Roles.id \
+where News.shared = 1 \
+;");
+    while (pResult->next())
+    {
+        int nGroupId = pResult->getInt("fk_Groups_id");
+        int nAuthorId = pResult->getInt("fk_Users_id");
+        for(size_t j = 0; j < aGroupsVisibleByWatcher.size(); ++j)
+        {
+            if(aGroupsVisibleByWatcher.at(j).m_nId == nGroupId)
+            {
+                SNews PreNews = SNews(pResult->getInt("id"),
+                                      pResult->getInt("fk_Roles_id"),
+                                      pResult->getString("created").c_str(),
+                                      pResult->getString("subject").c_str(),
+                                      pResult->getString("text").c_str(),
+                                      pResult->getInt("anonymously"),
+                                      pResult->getInt("shared"));
+                CNews News = CNews(PreNews);
+                if(!PreNews.m_bAnonymously)
+                {
+                    News.addAuthor(findUserById(nAuthorId));
+                }
+                News.addGroup(findGroupById(nGroupId));
+                Result.push_back(News);
+
+                break;
+            }
+        }
+    }
+    delete pResult;
+    return Result;
+}
+
+/*std::vector<CGroup> COrm::selectAllGroupsInfoVisibleByUser(int nId)
 {
     qDebug() << __FUNCTION__;
     std::vector<CGroup> Result;
@@ -342,7 +417,7 @@ or Groups.type = 'public';");
     delete pResult;
     delete pPreparedStatement;
     return Result;
-}
+}*/
 
 std::vector<SGroup> COrm::selectGroupsAll()
 {
@@ -583,6 +658,7 @@ void COrm::dropTables()
     m_pCSqlConnector->execute(MESSAGE_DROP_SCRIPT);
     m_pCSqlConnector->execute(GROUP_DROP_SCRIPT);
     m_pCSqlConnector->execute(ROLE_DROP_SCRIPT);
+    m_pCSqlConnector->execute(NEWS_DROP_SCRIPT);
 }
 
 void COrm::createTables()
@@ -595,6 +671,7 @@ void COrm::createTables()
     m_pCSqlConnector->execute(MESSAGE_CREATE_SCRIPT);
     m_pCSqlConnector->execute(GROUP_CREATE_SCRIPT);
     m_pCSqlConnector->execute(ROLE_CREATE_SCRIPT);
+    m_pCSqlConnector->execute(NEWS_CREATE_SCRIPT);
 
     m_pCSqlConnector->execute(PLAYER_CONNECT_SCRIPT);
     m_pCSqlConnector->execute(CREDENTIAL_CONNECT_SCRIPT);
@@ -603,6 +680,7 @@ void COrm::createTables()
     m_pCSqlConnector->execute(GROUP_CONNECT_SCRIPT);
     m_pCSqlConnector->execute(ROLE_CONNECT_SCRIPT_1);
     m_pCSqlConnector->execute(ROLE_CONNECT_SCRIPT_2);
+    m_pCSqlConnector->execute(NEWS_CONNECT_SCRIPT);
 
     m_pCSqlConnector->execute(USER_UTF8_SCRIPT);
     m_pCSqlConnector->execute(PLAYER_UTF8_SCRIPT);
@@ -610,6 +688,7 @@ void COrm::createTables()
     m_pCSqlConnector->execute(MESSAGE_UTF8_SCRIPT);
     m_pCSqlConnector->execute(GROUP_UTF8_SCRIPT);
     m_pCSqlConnector->execute(ROLE_UTF8_SCRIPT);
+    m_pCSqlConnector->execute(NEWS_UTF8_SCRIPT);
     /// keys
     enableForingKeys();
 }

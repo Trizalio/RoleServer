@@ -21,6 +21,8 @@ public:
     QByteArray getProjectsDataByWatcher(int nId);
     QByteArray getProjectsAllData();
 
+    QByteArray getNewsAllByWatcher(int nId);
+
 private:
     QByteArray getJsonFromUser(SUser& User);
 
