@@ -1,6 +1,8 @@
 #ifndef SUSER_H
 #define SUSER_H
 
+#include <QDebug>
+
 #include "cjsonserializable.h"
 
 #define USER_DROP_SCRIPT "DROP TABLE IF EXISTS `Users`;"
@@ -38,6 +40,7 @@ public:
             std::string sDescription);
 
     QJsonObject getJsonObject() override;
+    static SUser getObjectFromJson(QByteArray jUser);
 
     int m_nId = 0;
     std::string m_sName;

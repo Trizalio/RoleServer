@@ -36,5 +36,78 @@ QJsonObject SUser::getJsonObject()
     jUser.insert("Profession",m_sProfession.c_str());
     jUser.insert("Description",m_sDescription.c_str());
 
+//    QJsonValue jId = jUser.take("Id");
+//    int nId = jId.toInt();
+//    qDebug() << m_nId << "Id read from serialize" << jId.toInt() << jId.toDouble() << jId.toString() << jId.toVariant();
+
     return jUser;
+}
+
+SUser SUser::getObjectFromJson(QByteArray jUser)
+{
+    qDebug() << __FUNCTION__;
+    QJsonParseError jError;
+    QJsonDocument jDocument = QJsonDocument::fromJson(jUser, &jError);
+    if(jError.error != QJsonParseError::NoError
+            || !jDocument.isObject())
+    {
+        qDebug() << "parse error";
+        return SUser();
+    }
+    QJsonObject jNewUser = jDocument.object();
+    if(!jNewUser.contains("Name")
+            || !jNewUser.contains("Surname")
+            || !jNewUser.contains("Patronymic")
+            || !jNewUser.contains("BirthDate")
+            || !jNewUser.contains("Profession")
+            || !jNewUser.contains("Description"))
+    {
+        qDebug() << "not enough fields";
+        return SUser();
+    }
+    QJsonValue jName = jNewUser.take("Name");
+    QJsonValue jSurname = jNewUser.take("Surname");
+    QJsonValue jPatronymic = jNewUser.take("Patronymic");
+    QJsonValue jBirthDate = jNewUser.take("BirthDate");
+    QJsonValue jProfession = jNewUser.take("Profession");
+    QJsonValue jDescription = jNewUser.take("Description");
+    if(!jName.isString()
+            || !jSurname.isString()
+            || !jPatronymic.isString()
+            || !jBirthDate.isString()
+            || !jProfession.isString()
+            || !jDescription.isString())
+    {
+        qDebug() << "wrong type";
+        return SUser();
+    }
+    std::string sName = jName.toString().toStdString();
+    std::string sSurname = jSurname.toString().toStdString();
+    std::string sPatronymic = jPatronymic.toString().toStdString();
+    std::string sBirthDate = jBirthDate.toString("2080-01-01").toStdString();
+    std::string sProfession = jProfession.toString().toStdString();
+    std::string sDescription = jDescription.toString().toStdString();
+    if(jNewUser.contains("Id"))
+    {
+        QJsonValue jId = jNewUser.take("Id");
+        if(jId.isDouble())
+        {
+            int nId = jId.toInt();
+            qDebug() << "Id detected" << nId;
+            return SUser(nId,
+                       sName,
+                       sSurname,
+                       sPatronymic,
+                       sBirthDate,
+                       sProfession,
+                       sDescription);
+        }
+    }
+    qDebug() << "No id detected";
+    return SUser(sName,
+               sSurname,
+               sPatronymic,
+               sBirthDate,
+               sProfession,
+               sDescription);
 }

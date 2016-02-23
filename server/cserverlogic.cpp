@@ -6,11 +6,11 @@ CServerLogic::CServerLogic(CSqlConnector *pSqlConnector):
 
 }
 
-int CServerLogic::login(std::string sLogin, std::string sPassword)
+SPlayer CServerLogic::login(std::string sLogin, std::string sPassword)
 {
     qDebug() << __FUNCTION__;
     SPlayer Player = m_Orm.findPlayerByLoginAndPassHash(sLogin, sPassword);
-    return Player.m_nId;
+    return Player;
 }
 
 QByteArray CServerLogic::getPlayerData(int nId)
@@ -68,6 +68,27 @@ QByteArray CServerLogic::getProjectDataByWatcher(int nId, int nWatcherId)
     return Group.getJson();
 }
 
+QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> aGroups = m_Orm.selectAllGroupsVisibleByUser(nId);
+    qDebug() << aGroups.size();
+
+
+    QJsonArray jArray;
+    for(size_t i = 0; i < aGroups.size(); ++i)
+    {
+        QJsonValue jValue(aGroups[i].getJsonObject());
+        jArray.append(jValue);
+    }
+
+    QJsonDocument jDocument;
+    jDocument.setArray(jArray);
+    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
+
+    return aJson;
+}
+/// TODO merge methods
 QByteArray CServerLogic::getProjectsAllData()
 {
     qDebug() << __FUNCTION__;
@@ -107,25 +128,30 @@ QByteArray CServerLogic::getNewsAllByWatcher(int nId)
     return aJson;
 }
 
-QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
+bool CServerLogic::addUser(QByteArray jUser)
 {
     qDebug() << __FUNCTION__;
-    std::vector<SGroup> aGroups = m_Orm.selectAllGroupsVisibleByUser(nId);
-    qDebug() << aGroups.size();
+    SUser User = SUser::getObjectFromJson(jUser);
+    m_Orm.insertUser(User);
+    return true;
+}
 
-
-    QJsonArray jArray;
-    for(size_t i = 0; i < aGroups.size(); ++i)
+bool CServerLogic::updateUser(QByteArray jUser)
+{
+    qDebug() << __FUNCTION__;
+    SUser User = SUser::getObjectFromJson(jUser);
+    if(User.m_nId)
     {
-        QJsonValue jValue(aGroups[i].getJsonObject());
-        jArray.append(jValue);
+        m_Orm.updateUser(User);
+        return true;
     }
+    return false;
+}
 
-    QJsonDocument jDocument;
-    jDocument.setArray(jArray);
-    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
-
-    return aJson;
+bool CServerLogic::deleteUser(int nUserId)
+{
+//    m_Orm.insertUser(User);
+    return false;
 }
 
 QByteArray CServerLogic::getJsonFromUser(SUser &User)

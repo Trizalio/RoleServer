@@ -6,28 +6,33 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     // №Terra04C24
     dropTables();
     createTables();
-    SUser User1("Олег","Пчёлкин","Борисович","2074-09-03",
+    SUser User2("Олег","Пчёлкин","Борисович","2074-09-03",
                "Начальник терраформационной базы","Обращаться через секретаря");
-    SUser User2("Лаврентий","Лютов","Тимурович","2064-12-05",
+    SUser User3("Лаврентий","Лютов","Тимурович","2064-12-05",
                "Личный секретарь начальника базы","Пожалуйста, составляйте обращения по протоколу, чётко и ясно. Не верно обормленные заявки рассматриваться не будут");
-    SUser User3("Никифор","Данилов","Григорьевич","2061-08-10",
+    SUser User4("Никифор","Данилов","Григорьевич","2061-08-10",
                "Начальник по техническому обеспечению","Пожалуйста, подавая заявки на получение образцов прикрепляйте план работ!");
-    SUser User4("Ариадна","Лебедева","Вечеславовна","2077-06-07",
+    SUser User5("Ариадна","Лебедева","Вечеславовна","2077-06-07",
                "Главный программист","Рада помочь!");
-    SUser User5("Ильин","Илья","Вадимович","2070-10-13",
+    SUser User6("Ильин","Илья","Вадимович","2070-10-13",
                 "Уборщик","По помытому не ходите!");
-    SPlayer Player1(1, "Парамон", "Щербаков", "Кириллович", "Mr. White",
-                   "1974-08-11", "Квента начальника базы");
-    SPlayer Player2(2, "Апполинарий", "Холодков", "Егорович", "Mr. Orange",
-                   "1989-03-17", "Квента секретаря начальника базы");
-    SPlayer Player3(3, "Никон", "Михайлов", "Святославович", "Mr. Red",
-                   "1986-02-02", "Старый космический волк. Настоящий космический боцман. Знает каждую заклепку корабля, каждый шурупчик на станции. Поддерживать эти объекты в рабочем состоянии - его непосредственная задача. Склады - это его вотчина, не расстается с планшетом, куда вносит каждую возможную неисправность. Параноик и перфекционист. С подчиненными строг, прекрасно знает, кто чем занят, а также кто, чем должен быть занят.");
-    SPlayer Player4(4, "Аза", "Стручкова", "Александровна", "Ms. Orange",
-                   "1973-01-16", "Если технический персонал, что-то собрал, то самое время найти программиста, чтобы аппарат ожил, замигал лампочками, зашевелился. И не спрашивайте, как этим управлять. Если вы в принципе способны что-то понять, вам все объяснят. Полный курс космической подготовки.");
-    SCredential Credential1(1, "1", "1");
-    SCredential Credential2(2, "2", "2");
-    SCredential Credential3(3, "3", "3");
-    SCredential Credential4(4, "4", "4");
+    SPlayer Player1("Орлов", "Михаил", "Юрьевич", "Тризалио",
+                   "1991-03-21", "Администратор", true);
+    SPlayer Player2(1, "Парамон", "Щербаков", "Кириллович", "Mr. White",
+                   "1974-08-11", "Квента начальника базы", false);
+    SPlayer Player3(2, "Апполинарий", "Холодков", "Егорович", "Mr. Orange",
+                   "1989-03-17", "Квента секретаря начальника базы", false);
+    SPlayer Player4(3, "Никон", "Михайлов", "Святославович", "Mr. Red", "1986-02-02",
+                    "Старый космический волк. Настоящий космический боцман. Знает каждую заклепку корабля, каждый шурупчик на станции. Поддерживать эти объекты в рабочем состоянии - его непосредственная задача. Склады - это его вотчина, не расстается с планшетом, куда вносит каждую возможную неисправность. Параноик и перфекционист. С подчиненными строг, прекрасно знает, кто чем занят, а также кто, чем должен быть занят.",
+                    false);
+    SPlayer Player5(4, "Аза", "Стручкова", "Александровна", "Ms. Orange", "1973-01-16",
+                    "Если технический персонал что-то собрал, то самое время найти программиста, чтобы аппарат ожил, замигал лампочками, зашевелился. И не спрашивайте, как этим управлять. Если вы в принципе способны что-то понять, вам все объяснят. Полный курс космической подготовки.",
+                    false);
+    SCredential Credential1(1, "0", "0");
+    SCredential Credential2(2, "1", "1");
+    SCredential Credential3(3, "2", "2");
+    SCredential Credential4(4, "3", "3");
+    SCredential Credential5(5, "4", "4");
     SGroup Group1(0, "Управление базы", "Принимает наиболее важные решения в жизни базы", SGroup::LAB);
     SGroup Group2(1, "Отдел Технического обеспечения", "Обеспечивает нормальную работу техноческой составляющей базы", SGroup::LAB);
     SGroup Group3(0, "Нарушение системы жизнеобесспечения", "Необходимо повредить регенератор кислорода, воды, контроллер давления или систему поглощения углекислого газа", SGroup::HIDDEN);
@@ -41,21 +46,23 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     SNews News3(4, "2107-03-27", "Обмен", "Обменяю полное собрание сочинений Джорджа Мартина, 76 томов, 23 гигабайта. Комиксы и интерактивки не предлагать!", false, false);
     SNews News4(5, "2109-11-07", "Пора действовать", "Время уходит, каждый день снижает шанс нашей миссии. Поторопитсь.", true, true);
     qDebug() << "insert";
-    insertUser(User1);
     insertUser(User2);
     insertUser(User3);
     insertUser(User4);
     insertUser(User5);
+    insertUser(User6);
     qDebug() << "User";
     insertPlayer(Player1);
     insertPlayer(Player2);
     insertPlayer(Player3);
     insertPlayer(Player4);
+    insertPlayer(Player5);
     qDebug() << "Player";
     insertCredential(Credential1);
     insertCredential(Credential2);
     insertCredential(Credential3);
     insertCredential(Credential4);
+    insertCredential(Credential5);
     qDebug() << "Credential";
     insertGroup(Group1);
     insertGroup(Group2);
@@ -100,17 +107,28 @@ void COrm::insertUser(SUser& User)
 
 void COrm::insertPlayer(SPlayer &Player)
 {
-    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Players` \
-(`fk_Users_id`,`name`,`surname`,`patronymic`,`nick`,`birth_date`,`quenta`) VALUES \
-(?,?,?,?,?,?,?);");
+    sql::PreparedStatement* pPreparedStatement;
     unsigned short i = 1;
-    pPreparedStatement->setInt(i++, Player.m_nUserId);
+    if(Player.m_nUserId)
+    {
+        pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Players` \
+(`fk_Users_id`,`name`,`surname`,`patronymic`,`nick`,`birth_date`,`quenta`,`admin`) VALUES \
+(?,?,?,?,?,?,?,?);");
+        pPreparedStatement->setInt(i++, Player.m_nUserId);
+    }
+    else
+    {
+        pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Players` \
+(`name`,`surname`,`patronymic`,`nick`,`birth_date`,`quenta`,`admin`) VALUES \
+(?,?,?,?,?,?,?);");
+    }
     pPreparedStatement->setString(i++, Player.m_sName);
     pPreparedStatement->setString(i++, Player.m_sSurname);
     pPreparedStatement->setString(i++, Player.m_sPatronymic);
     pPreparedStatement->setString(i++, Player.m_sNick);
     pPreparedStatement->setString(i++, Player.m_sBirthDate);
     pPreparedStatement->setString(i++, Player.m_sQuenta);
+    pPreparedStatement->setInt(i++, (int)(Player.m_bAdmin));
     pPreparedStatement->executeUpdate();
     delete pPreparedStatement;
 }
@@ -194,6 +212,59 @@ void COrm::insertNews(SNews &News)
     delete pPreparedStatement;
 }
 
+void COrm::updateUser(SUser &User)
+{
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `Users` \
+SET `name`=?,`surname`=?,`patronymic`=?,`birth_date`=?,`profession`=?,`description`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setString(i++, User.m_sName);
+    pPreparedStatement->setString(i++, User.m_sSurname);
+    pPreparedStatement->setString(i++, User.m_sPatronymic);
+    pPreparedStatement->setString(i++, User.m_sBirthDate);
+    pPreparedStatement->setString(i++, User.m_sProfession);
+    pPreparedStatement->setString(i++, User.m_sDescription);
+    pPreparedStatement->setInt(i++, User.m_nId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+void COrm::deleteUser(int &nUserId)
+{
+
+}
+
+void COrm::deletePlayer(int &nPlayerId)
+{
+
+}
+
+void COrm::deleteCredential(int &nCredentialId)
+{
+
+}
+
+void COrm::deleteGroup(int &nGroupId)
+{
+
+}
+
+void COrm::deleteRole(int &nRoleId)
+{
+
+}
+
+void COrm::deleteNews(int &nNewsId)
+{
+
+}
+
+//void COrm::deleteMessage(int &nMessageId)
+//{
+
+//}
+
 std::vector<SDialogue> COrm::selectUserDialogues()
 {
     std::vector<SDialogue> aResult;
@@ -269,7 +340,22 @@ std::vector<SGroup> COrm::selectAllGroupsVisibleByUser(int nId)
     qDebug() << __FUNCTION__;
     std::vector<SGroup> Result;
 
-    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+    SPlayer Player = findPlayerById(nId);
+
+    sql::PreparedStatement* pPreparedStatement;
+    if(Player.m_bAdmin)
+    {
+        pPreparedStatement = m_pCSqlConnector->prepare("\
+select Groups.id, \
+Groups.fk_Groups_id_parent, \
+Groups.name, \
+Groups.description, \
+Groups.type \
+from Groups");
+    }
+    else
+    {
+        pPreparedStatement = m_pCSqlConnector->prepare("\
 select ChildGroups.id, \
 ChildGroups.fk_Groups_id_parent, \
 ChildGroups.name, \
@@ -309,9 +395,10 @@ Groups.type \
 from Groups \
 where Groups.type = 'lab'\
 or Groups.type = 'public';");
-    unsigned short i = 1;
-    pPreparedStatement->setInt(i++, nId);
-    pPreparedStatement->setInt(i++, nId);
+        unsigned short i = 1;
+        pPreparedStatement->setInt(i++, nId);
+        pPreparedStatement->setInt(i++, nId);
+    }
     sql::ResultSet* pResult = pPreparedStatement->executeQuery();
     while (pResult->next()) {
         Result.push_back(SGroup(pResult->getInt("id"),
@@ -343,6 +430,7 @@ from News \
 join Roles \
 on News.fk_Roles_id = Roles.id \
 where News.shared = 1 \
+order by News.created desc \
 ;");
     while (pResult->next())
     {
@@ -486,7 +574,8 @@ Players.surname, \
 Players.patronymic, \
 Players.nick, \
 Players.birth_date, \
-Players.quenta \
+Players.quenta, \
+Players.admin \
 from Players \
 join Credentials \
 on Players.id = Credentials.id \
@@ -498,14 +587,17 @@ and Credentials.passwordHash = ?;");
     qDebug() << sLogin.c_str() <<sPasswordHash.c_str();
     sql::ResultSet* pResult = pPreparedStatement->executeQuery();
     while (pResult->next()) {
-        Result = SPlayer(pResult->getInt("id"),
-            pResult->getInt("fk_Users_id"),
-            pResult->getString("name").c_str(),
-            pResult->getString("surname").c_str(),
-            pResult->getString("patronymic").c_str(),
-            pResult->getString("nick").c_str(),
-            pResult->getString("birth_date").c_str(),
-            pResult->getString("quenta").c_str());
+        Result = SPlayer(
+                    pResult->getInt("id"),
+                    pResult->getInt("fk_Users_id"),
+                    pResult->getString("name").c_str(),
+                    pResult->getString("surname").c_str(),
+                    pResult->getString("patronymic").c_str(),
+                    pResult->getString("nick").c_str(),
+                    pResult->getString("birth_date").c_str(),
+                    pResult->getString("quenta").c_str(),
+                    (bool)pResult->getInt("admin")
+        );
     }
     delete pResult;
     delete pPreparedStatement;
@@ -524,21 +616,25 @@ Players.surname, \
 Players.patronymic, \
 Players.nick, \
 Players.birth_date, \
-Players.quenta \
+Players.quenta, \
+Players.admin \
 from Players \
 where Players.id = ?;");
     unsigned short i = 1;
     pPreparedStatement->setInt(i++, nId);
     sql::ResultSet* pResult = pPreparedStatement->executeQuery();
     while (pResult->next()) {
-        Result = SPlayer(pResult->getInt("id"),
-            pResult->getInt("fk_Users_id"),
-            pResult->getString("name").c_str(),
-            pResult->getString("surname").c_str(),
-            pResult->getString("patronymic").c_str(),
-            pResult->getString("nick").c_str(),
-            pResult->getString("birth_date").c_str(),
-            pResult->getString("quenta").c_str());
+        Result = SPlayer(
+                    pResult->getInt("id"),
+                    pResult->getInt("fk_Users_id"),
+                    pResult->getString("name").c_str(),
+                    pResult->getString("surname").c_str(),
+                    pResult->getString("patronymic").c_str(),
+                    pResult->getString("nick").c_str(),
+                    pResult->getString("birth_date").c_str(),
+                    pResult->getString("quenta").c_str(),
+                    (bool)pResult->getInt("admin")
+        );
     }
     delete pResult;
     delete pPreparedStatement;

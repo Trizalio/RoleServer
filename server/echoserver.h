@@ -19,6 +19,18 @@ QT_FORWARD_DECLARE_CLASS(QWebSocket)
 #include "cplanetjson.h"
 #include "cserverlogic.h"
 
+struct SConnection
+{
+    SConnection(int nId, bool bAdmin):
+        m_nId(nId),
+        m_bAdmin(bAdmin)
+    {}
+    SConnection()
+    {}
+    int m_nId = 0;
+    bool m_bAdmin = false;
+};
+
 class EchoServer : public QObject
 {
     Q_OBJECT
@@ -42,7 +54,7 @@ private Q_SLOTS:
 
 private:
 
-    std::unordered_map<QWebSocket*, int> m_ConnectionToPlayerId;
+    std::unordered_map<QWebSocket*, SConnection> m_ConnectionToPlayerId;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     bool m_debug;

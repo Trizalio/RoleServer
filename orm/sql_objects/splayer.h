@@ -6,13 +6,14 @@
 #define PLAYER_DROP_SCRIPT "DROP TABLE IF EXISTS `Players`;"
 #define PLAYER_CREATE_SCRIPT "CREATE TABLE `Players` ( \
 `id` INTEGER NOT NULL AUTO_INCREMENT, \
-`fk_Users_id` INTEGER NOT NULL, \
+`fk_Users_id` INTEGER NULL, \
 `name` VARCHAR(50) NOT NULL, \
 `surname` VARCHAR(50) NOT NULL, \
 `patronymic` VARCHAR(50) NOT NULL, \
 `nick` VARCHAR(50) NOT NULL, \
 `birth_date` DATE NOT NULL, \
 `quenta` MEDIUMTEXT NOT NULL, \
+`admin` TINYINT NOT NULL, \
 PRIMARY KEY (`id`), \
 KEY (`fk_Users_id`) \
 );"
@@ -31,13 +32,15 @@ public:
             std::string sPatronymic,
             std::string sNick,
             std::string sBirthDate,
-            std::string sQuenta):
+            std::string sQuenta,
+            bool bAdmin):
         m_sName(sName),
         m_sSurname(sSurname),
         m_sPatronymic(sPatronymic),
         m_sNick(sNick),
         m_sBirthDate(sBirthDate),
-        m_sQuenta(sQuenta)
+        m_sQuenta(sQuenta),
+        m_bAdmin(bAdmin)
     {}
     SPlayer(int nUserId,
             std::string sName,
@@ -45,14 +48,16 @@ public:
             std::string sPatronymic,
             std::string sNick,
             std::string sBirthDate,
-            std::string sQuenta):
+            std::string sQuenta,
+            bool bAdmin):
         m_nUserId(nUserId),
         m_sName(sName),
         m_sSurname(sSurname),
         m_sPatronymic(sPatronymic),
         m_sNick(sNick),
         m_sBirthDate(sBirthDate),
-        m_sQuenta(sQuenta)
+        m_sQuenta(sQuenta),
+        m_bAdmin(bAdmin)
     {}
     SPlayer(int nId,
             int nUserId,
@@ -61,7 +66,8 @@ public:
             std::string sPatronymic,
             std::string sNick,
             std::string sBirthDate,
-            std::string sQuenta):
+            std::string sQuenta,
+            bool bAdmin):
         m_nId(nId),
         m_nUserId(nUserId),
         m_sName(sName),
@@ -69,7 +75,8 @@ public:
         m_sPatronymic(sPatronymic),
         m_sNick(sNick),
         m_sBirthDate(sBirthDate),
-        m_sQuenta(sQuenta)
+        m_sQuenta(sQuenta),
+        m_bAdmin(bAdmin)
     {}
 
     int m_nId = 0;
@@ -83,6 +90,8 @@ public:
     std::string m_sBirthDate;
 
     std::string m_sQuenta;
+
+    bool m_bAdmin = false;
 };
 
 #endif // SPLAYER

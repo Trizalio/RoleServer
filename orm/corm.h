@@ -29,6 +29,16 @@ public:
     void insertRole(SRole& Role);
     void insertNews(SNews& News);
 
+    void updateUser(SUser& User);
+
+    void deleteUser(int& nUserId);
+    void deletePlayer(int& nPlayerId);
+    void deleteCredential(int& nCredentialId);
+//    void deleteMessage(int& nMessageId);
+    void deleteGroup(int& nGroupId);
+    void deleteRole(int& nRoleId);
+    void deleteNews(int& nNewsId);
+
     SUser findUserById(int nId);
     SPlayer findPlayerById(int nId);
     SGroup findGroupById(int nId);
