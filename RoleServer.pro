@@ -35,7 +35,10 @@ SOURCES += main.cpp \
     orm/sql_objects/suser.cpp \
     orm/sql_objects/cjsonserializable.cpp \
     orm/sql_objects/snews.cpp \
-    orm/aggregation_objects/cnews.cpp
+    orm/aggregation_objects/cnews.cpp \
+    orm/aggregation_objects/cplayer.cpp \
+    orm/sql_objects/scredential.cpp \
+    orm/sql_objects/splayer.cpp
 
 HEADERS += \
     server/echoserver.h \
@@ -59,7 +62,8 @@ HEADERS += \
     orm/aggregation_objects/cgroup.h \
     orm/sql_objects/cjsonserializable.h \
     orm/sql_objects/snews.h \
-    orm/aggregation_objects/cnews.h
+    orm/aggregation_objects/cnews.h \
+    orm/aggregation_objects/cplayer.h
 
 unix:!macx: LIBS += -L$$PWD/../../sdk/mysql-connector/lib/ -lmysqlcppconn
 

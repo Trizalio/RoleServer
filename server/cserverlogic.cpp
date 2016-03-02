@@ -35,6 +35,25 @@ QByteArray CServerLogic::getPlayerData(int nId)
     return aJson;
 }
 
+QByteArray CServerLogic::getPlayersAll()
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SPlayer> aPlayers = m_Orm.selectPlayersAll();
+
+    QJsonArray jArray;
+    for(size_t i = 0; i < aPlayers.size(); ++i)
+    {
+        QJsonValue jValue(aPlayers[i].getJsonObject());
+        jArray.append(jValue);
+    }
+
+    QJsonDocument jDocument;
+    jDocument.setArray(jArray);
+    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
+
+    return aJson;
+}
+
 QByteArray CServerLogic::getUserDataByWatcher(int nId, int nWatcherId)
 {
     qDebug() << __FUNCTION__;

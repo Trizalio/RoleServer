@@ -28,11 +28,11 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     SPlayer Player5(4, "Аза", "Стручкова", "Александровна", "Ms. Orange", "1973-01-16",
                     "Если технический персонал что-то собрал, то самое время найти программиста, чтобы аппарат ожил, замигал лампочками, зашевелился. И не спрашивайте, как этим управлять. Если вы в принципе способны что-то понять, вам все объяснят. Полный курс космической подготовки.",
                     false);
-    SCredential Credential1(1, "0", "0");
-    SCredential Credential2(2, "1", "1");
-    SCredential Credential3(3, "2", "2");
-    SCredential Credential4(4, "3", "3");
-    SCredential Credential5(5, "4", "4");
+    SCredential Credential1(1, "0", SCredential::getPassHash("0"));
+    SCredential Credential2(2, "1", SCredential::getPassHash("1"));
+    SCredential Credential3(3, "2", SCredential::getPassHash("2"));
+    SCredential Credential4(4, "3", SCredential::getPassHash("3"));
+    SCredential Credential5(5, "4", SCredential::getPassHash("4"));
     SGroup Group1(0, "Управление базы", "Принимает наиболее важные решения в жизни базы", SGroup::LAB);
     SGroup Group2(1, "Отдел Технического обеспечения", "Обеспечивает нормальную работу техноческой составляющей базы", SGroup::LAB);
     SGroup Group3(0, "Нарушение системы жизнеобесспечения", "Необходимо повредить регенератор кислорода, воды, контроллер давления или систему поглощения углекислого газа", SGroup::HIDDEN);
@@ -284,6 +284,25 @@ std::vector<SUser> COrm::selectUserAll()
             pResult->getString("birth_date").c_str(),
             pResult->getString("profession").c_str(),
             pResult->getString("description").c_str()));
+    }
+    delete pResult;
+    return Result;
+}
+
+std::vector<SPlayer> COrm::selectPlayersAll()
+{
+    std::vector<SPlayer> Result;
+    sql::ResultSet* pResult = m_pCSqlConnector->executeResult("SELECT * FROM Players;");
+    while (pResult->next()) {
+        Result.push_back(SPlayer(pResult->getInt("id"),
+            pResult->getInt("fk_Users_id"),
+            pResult->getString("name").c_str(),
+            pResult->getString("surname").c_str(),
+            pResult->getString("patronymic").c_str(),
+            pResult->getString("nick").c_str(),
+            pResult->getString("birth_date").c_str(),
+            pResult->getString("quenta").c_str(),
+            pResult->getInt("admin")));
     }
     delete pResult;
     return Result;

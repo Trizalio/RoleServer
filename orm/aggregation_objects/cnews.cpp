@@ -1,6 +1,6 @@
 #include "cnews.h"
 
-CNews::CNews(SNews News):
+CNews::CNews(SNews &News):
     m_News(News)
 {
 

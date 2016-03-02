@@ -39,41 +39,42 @@ public:
     void deleteRole(int& nRoleId);
     void deleteNews(int& nNewsId);
 
+    /////////////////////
+    /// Basic objects ///
+    /////////////////////
+
     SUser findUserById(int nId);
     SPlayer findPlayerById(int nId);
     SGroup findGroupById(int nId);
     std::vector<SRole> findRolesByUserId(int nUserId);
     std::vector<SRole> findRolesByGroupId(int nGroupId);
-//    void
-
-
-
     SPlayer findPlayerByLoginAndPassHash(std::string sLogin, std::string sPasswordHash);
 
     ///////////////////////////
-    /// aggregation objects ///
+    /// Aggregation objects ///
     ///////////////////////////
 
-    std::vector<SDialogue> selectUserDialogues();
+    std::vector<SDialogue> selectUserDialogues(); /// Unused
     CUser getUserInfoById(int nId, int nWatcherId);
     CGroup getGroupInfoByIdByWatcher(int nId, int nWatcherId);
     CGroup getGroupInfoById(int nId);
     std::vector<CNews> selectNewsAllVisibleByUser(int nWatcherId);
 
     /////////////
-    /// other ///
+    /// Other ///
     /////////////
 
     std::vector<SGroup> selectAllGroupsVisibleByUser(int nId);
 
 
     ////////////
-    /// junk ///
+    /// Junk ///
     ////////////
 
 //    std::vector<CGroup> selectAllGroupsInfoVisibleByUser(int nId);
     std::vector<SGroup> selectGroupsAll();
-    std::vector<SUser> selectUserAll();
+    std::vector<SUser> selectUserAll(); /// Used
+    std::vector<SPlayer> selectPlayersAll(); /// Used
     SPlayer selectPlayerBy(std::string sName, std::string sSurname, std::string sPatronymic,
                            std::string sNick, std::string sBirthDate, std::string sQuenta);
 

@@ -8,7 +8,7 @@
 class CNews : public CJsonSerializable
 {
 public:
-    CNews(SNews News);
+    CNews(SNews& News);
 
     void addAuthor(SUser Author);
     void addGroup(SGroup Group);

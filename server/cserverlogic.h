@@ -13,13 +13,14 @@ public:
 
     SPlayer login(std::string sLogin, std::string sPassword);
     QByteArray getPlayerData(int nId);
+    QByteArray getPlayersAll(); /// Admin
 
     QByteArray getUserDataByWatcher(int nId, int nWatcherId);
     QByteArray getUsersAllData();
 
     QByteArray getProjectDataByWatcher(int nId, int nWatcherId);
     QByteArray getProjectsDataByWatcher(int nId);
-    QByteArray getProjectsAllData();
+    QByteArray getProjectsAllData(); /// Unused
 
     QByteArray getNewsAllByWatcher(int nId);
 

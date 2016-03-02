@@ -191,6 +191,21 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to player data";
                 }
             }
+            if(sValue == "players")
+            {
+                if(Connection.m_bAdmin)
+                {
+                    QByteArray aJson = m_ServerLogic.getPlayersAll();
+                    QByteArray aAnswer = "players data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("not allowed:");
+                    qDebug() << "unauthorized access to players data";
+                }
+            }
             if(sValue == "user")
             {
 ///                allowed while testing
