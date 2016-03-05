@@ -2,9 +2,14 @@
 #include <QCryptographicHash>
 #include <QDebug>
 
+#define SALT "Trizalio"
+
 std::string SCredential::getPassHash(std::string sPassword)
 {
-    QString sHash = QCryptographicHash::hash(sPassword.c_str(), QCryptographicHash::Md5).toHex();
+    std::string sPassWithSalt(sPassword);
+    sPassWithSalt.append(SALT);
+    qDebug() << sPassWithSalt.c_str();
+    QString sHash = QCryptographicHash::hash(sPassWithSalt.c_str(), QCryptographicHash::Md5).toHex();
     qDebug() << sHash.toStdString().c_str();
     return sHash.toStdString();
 }
