@@ -259,6 +259,35 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to manage player data";
                 }
             }
+            else if(sValue == "credential")
+            {
+                if(Connection.m_bAdmin)
+                {
+                    QString sOperation = message.section(" ", 2, 2);
+                    if(sOperation == "set")
+                    {
+                        QByteArray sData = message.section(" ", 3).toUtf8();
+                        bool bResult = m_ServerLogic.updatePlayerCredential(sData);
+                        if(bResult)
+                        {
+                            pClient->sendTextMessage("credential updated:");
+                        }
+                        else
+                        {
+                            pClient->sendTextMessage("credential manage fail:data process error");
+                        }
+                    }
+                    else
+                    {
+                        pClient->sendTextMessage("credential manage fail:no such command");
+                    }
+                }
+                else
+                {
+                    pClient->sendTextMessage("not allowed:");
+                    qDebug() << "unauthorized access to manage credential data";
+                }
+            }
             else
             {
                 pClient->sendTextMessage("unrecognized type:");

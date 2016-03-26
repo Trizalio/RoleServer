@@ -27,6 +27,7 @@ public:
 
     bool addPlayer(QByteArray jPlayer);
     bool updatePlayer(QByteArray jPlayer);
+    bool updatePlayerCredential(QByteArray jCredential);
     bool deletePlayer(int nPlayerId);
 
     bool addUser(QByteArray jUser);

@@ -31,6 +31,7 @@ public:
 
     void updateUser(SUser& User);
     void updatePlayer(SPlayer& Player);
+    void updateCredential(SCredential& Credential);
 
     void deleteUser(int& nUserId);
     void deletePlayer(int& nPlayerId);

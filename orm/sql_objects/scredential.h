@@ -24,6 +24,7 @@ public:
             std::string sLogin,
             std::string sPasswordHash);
 
+    static SCredential getObjectFromJson(QByteArray jCredential);
 
     int m_nId = 0;
     std::string m_sLogin;

@@ -165,6 +165,18 @@ bool CServerLogic::updatePlayer(QByteArray jPlayer)
     return false;
 }
 
+bool CServerLogic::updatePlayerCredential(QByteArray jCredential)
+{
+    qDebug() << __FUNCTION__;
+    SCredential Credential = SCredential::getObjectFromJson(jCredential);
+    if(Credential.m_nId)
+    {
+        m_Orm.updateCredential(Credential);
+        return true;
+    }
+    return false;
+}
+
 bool CServerLogic::deletePlayer(int nPlayerId)
 {
     //    m_Orm.insertUser(User);

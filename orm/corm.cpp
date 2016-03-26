@@ -277,6 +277,25 @@ WHERE id=?;");
 
 }
 
+void COrm::updateCredential(SCredential &Credential)
+{
+//    INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE    name="A", age=19
+
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Credentials` \
+(`id`,`login`,`passwordHash`) VALUES \
+(?,?,?) \
+ON DUPLICATE KEY UPDATE \
+login=?, passwordHash=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, Credential.m_nId);
+    pPreparedStatement->setString(i++, Credential.m_sLogin);
+    pPreparedStatement->setString(i++, Credential.m_sPasswordHash);
+    pPreparedStatement->setString(i++, Credential.m_sLogin);
+    pPreparedStatement->setString(i++, Credential.m_sPasswordHash);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
 void COrm::deleteUser(int &nUserId)
 {
 
