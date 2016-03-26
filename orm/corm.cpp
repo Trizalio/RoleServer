@@ -230,6 +230,53 @@ WHERE id=?;");
     delete pPreparedStatement;
 }
 
+void COrm::updatePlayer(SPlayer &Player)
+{
+
+//    sql::PreparedStatement* pPreparedStatement;
+//    unsigned short i = 1;
+//    if(Player.m_nUserId)
+//    {
+//        pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Players` \
+//(`fk_Users_id`,`name`,`surname`,`patronymic`,`nick`,`birth_date`,`quenta`,`admin`) VALUES \
+//(?,?,?,?,?,?,?,?);");
+//        pPreparedStatement->setInt(i++, Player.m_nUserId);
+//    }
+//    else
+//    {
+//        pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Players` \
+//(`name`,`surname`,`patronymic`,`nick`,`birth_date`,`quenta`,`admin`) VALUES \
+//(?,?,?,?,?,?,?);");
+//    }
+//    pPreparedStatement->setString(i++, Player.m_sName);
+//    pPreparedStatement->setString(i++, Player.m_sSurname);
+//    pPreparedStatement->setString(i++, Player.m_sPatronymic);
+//    pPreparedStatement->setString(i++, Player.m_sNick);
+//    pPreparedStatement->setString(i++, Player.m_sBirthDate);
+//    pPreparedStatement->setString(i++, Player.m_sQuenta);
+//    pPreparedStatement->setInt(i++, (int)(Player.m_bAdmin));
+//    pPreparedStatement->executeUpdate();
+//    delete pPreparedStatement;
+
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `Players` \
+SET `fk_Users_id`=?,`name`=?,`surname`=?,`patronymic`=?,`nick`=?,`birth_date`=?,`quenta`=?,`admin`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, Player.m_nUserId);
+    pPreparedStatement->setString(i++, Player.m_sName);
+    pPreparedStatement->setString(i++, Player.m_sSurname);
+    pPreparedStatement->setString(i++, Player.m_sPatronymic);
+    pPreparedStatement->setString(i++, Player.m_sNick);
+    pPreparedStatement->setString(i++, Player.m_sBirthDate);
+    pPreparedStatement->setString(i++, Player.m_sQuenta);
+    pPreparedStatement->setInt(i++, (int)Player.m_bAdmin);
+    pPreparedStatement->setInt(i++, Player.m_nId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+
+}
+
 void COrm::deleteUser(int &nUserId)
 {
 

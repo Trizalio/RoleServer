@@ -12,6 +12,7 @@ public:
     CServerLogic(CSqlConnector* pSqlConnector);
 
     SPlayer login(std::string sLogin, std::string sPassword);
+    SPlayer getPlayerById(int nId);
     QByteArray getPlayerData(int nId);
     QByteArray getPlayersAll(); /// Admin
 
@@ -24,6 +25,9 @@ public:
 
     QByteArray getNewsAllByWatcher(int nId);
 
+    bool addPlayer(QByteArray jPlayer);
+    bool updatePlayer(QByteArray jPlayer);
+    bool deletePlayer(int nPlayerId);
 
     bool addUser(QByteArray jUser);
     bool updateUser(QByteArray jUser);

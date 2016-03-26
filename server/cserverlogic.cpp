@@ -13,26 +13,20 @@ SPlayer CServerLogic::login(std::string sLogin, std::string sPassword)
     return Player;
 }
 
+SPlayer CServerLogic::getPlayerById(int nId)
+{
+    qDebug() << __FUNCTION__;
+    SPlayer Player = m_Orm.findPlayerById(nId);
+
+    return Player;
+}
+
 QByteArray CServerLogic::getPlayerData(int nId)
 {
     qDebug() << __FUNCTION__;
     SPlayer Player = m_Orm.findPlayerById(nId);
 
-    QJsonObject jPlayer;
-    jPlayer.insert("Id", Player.m_nId);
-    jPlayer.insert("UserId", Player.m_nUserId);
-    jPlayer.insert("Name", Player.m_sName.c_str());
-    jPlayer.insert("Surname", Player.m_sSurname.c_str());
-    jPlayer.insert("Patronymic", Player.m_sPatronymic.c_str());
-    jPlayer.insert("Nick", Player.m_sNick.c_str());
-    jPlayer.insert("BirthDate", Player.m_sBirthDate.c_str());
-    jPlayer.insert("Quenta", Player.m_sQuenta.c_str());
-
-    QJsonDocument jDocument;
-    jDocument.setObject(jPlayer);
-    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
-
-    return aJson;
+    return Player.getJson();
 }
 
 QByteArray CServerLogic::getPlayersAll()
@@ -147,10 +141,44 @@ QByteArray CServerLogic::getNewsAllByWatcher(int nId)
     return aJson;
 }
 
+bool CServerLogic::addPlayer(QByteArray jPlayer)
+{
+    qDebug() << __FUNCTION__;
+    SPlayer Player = SPlayer::getObjectFromJson(jPlayer);
+    if(Player.m_sName.empty())
+    {
+        return false;
+    }
+    m_Orm.insertPlayer(Player);
+    return true;
+}
+
+bool CServerLogic::updatePlayer(QByteArray jPlayer)
+{
+    qDebug() << __FUNCTION__;
+    SPlayer Player = SPlayer::getObjectFromJson(jPlayer);
+    if(Player.m_nId)
+    {
+        m_Orm.updatePlayer(Player);
+        return true;
+    }
+    return false;
+}
+
+bool CServerLogic::deletePlayer(int nPlayerId)
+{
+    //    m_Orm.insertUser(User);
+        return false;
+}
+
 bool CServerLogic::addUser(QByteArray jUser)
 {
     qDebug() << __FUNCTION__;
     SUser User = SUser::getObjectFromJson(jUser);
+    if(User.m_sName.empty())
+    {
+        return false;
+    }
     m_Orm.insertUser(User);
     return true;
 }

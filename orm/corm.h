@@ -30,6 +30,7 @@ public:
     void insertNews(SNews& News);
 
     void updateUser(SUser& User);
+    void updatePlayer(SPlayer& Player);
 
     void deleteUser(int& nUserId);
     void deletePlayer(int& nPlayerId);

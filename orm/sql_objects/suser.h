@@ -6,15 +6,16 @@
 #include "cjsonserializable.h"
 
 #define USER_DROP_SCRIPT "DROP TABLE IF EXISTS `Users`;"
-#define USER_CREATE_SCRIPT "CREATE TABLE `Users` (\
-`id` INTEGER NOT NULL AUTO_INCREMENT,\
-`name` VARCHAR(50) NOT NULL,\
-`surname` VARCHAR(50) NOT NULL,\
-`patronymic` VARCHAR(50) NOT NULL,\
-`birth_date` DATE NOT NULL,\
-`profession` VARCHAR(50) NOT NULL,\
-`description` MEDIUMTEXT NOT NULL,\
-PRIMARY KEY (`id`)\
+#define USER_CREATE_SCRIPT "CREATE TABLE `Users` ( \
+`id` INTEGER NOT NULL AUTO_INCREMENT, \
+`name` VARCHAR(50) NOT NULL, \
+`surname` VARCHAR(50) NOT NULL, \
+`patronymic` VARCHAR(50) NOT NULL, \
+`birth_date` DATE NOT NULL, \
+`profession` VARCHAR(50) NOT NULL, \
+`description` MEDIUMTEXT NOT NULL, \
+`deleted` TINYINT NOT NULL DEFAULT 0, \
+PRIMARY KEY (`id`) \
 );"
 
 #define USER_UTF8_SCRIPT "ALTER TABLE `Users` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;"

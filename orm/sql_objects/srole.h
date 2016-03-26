@@ -10,6 +10,7 @@
 `fk_Groups_id` INTEGER NOT NULL, \
 `owner` TINYINT NOT NULL, \
 PRIMARY KEY (`id`), \
+`accepted` TINYINT NOT NULL DEFAULT 0, \
 KEY (`fk_Groups_id`), \
 KEY (`fk_Users_id`) \
 );"

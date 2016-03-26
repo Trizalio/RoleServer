@@ -118,6 +118,37 @@ void EchoServer::processTextMessage(QString message)
                 m_ConnectionToPlayerId.erase(pClient);
                 pClient->sendTextMessage("logout ok:");
             }
+            if(sValue == "logas")
+            {
+                if(Connection.m_bAdmin)
+                {
+                    int nTargetId = message.section(" ", 2, 2).toInt();
+                    SPlayer Player = m_ServerLogic.getPlayerById(nTargetId);
+                    if(Player.m_nId > 0)
+                    {
+                        if(!Player.m_bAdmin)
+                        {
+                            m_ConnectionToPlayerId[pClient] = SConnection(Player.m_nId, false);
+                            pClient->sendTextMessage("logas ok:");
+                        }
+                        else
+                        {
+                            pClient->sendTextMessage("logas admin:");
+                            qDebug() << "attempt to logas admin";
+                        }
+                    }
+                    else
+                    {
+                        pClient->sendTextMessage("no player:");
+                        qDebug() << "attempt to logas unexistant user";
+                    }
+                }
+                else
+                {
+                    pClient->sendTextMessage("not allowed:");
+                    qDebug() << "unauthorized access to logas";
+                }
+            }
             else if(sValue == "user")
             {
                 if(Connection.m_bAdmin)
@@ -173,15 +204,83 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to manage user data";
                 }
             }
+            else if(sValue == "player")
+            {
+                if(Connection.m_bAdmin)
+                {
+                    QString sOperation = message.section(" ", 2, 2);
+                    if(sOperation == "add")
+                    {
+                        QByteArray sData = message.section(" ", 3).toUtf8();
+                        bool bResult = m_ServerLogic.addPlayer(sData);
+                        if(bResult)
+                        {
+                            pClient->sendTextMessage("player added:");
+                        }
+                        else
+                        {
+                            pClient->sendTextMessage("player manage fail:data process error");
+                        }
+                    }
+                    /*else if(sOperation == "delete")
+                    {
+                        int nUserId = message.section(" ", 3).toInt();;
+                        bool bResult = m_ServerLogic.addUser(sData);
+                        if(bResult)
+                        {
+                            pClient->sendTextMessage("user added:");
+                        }
+                        else
+                        {
+                            pClient->sendTextMessage("user manage fail:data process error");
+                        }
+                    }*/
+                    else if(sOperation == "update")
+                    {
+                        QByteArray sData = message.section(" ", 3).toUtf8();
+                        bool bResult = m_ServerLogic.updatePlayer(sData);
+                        if(bResult)
+                        {
+                            pClient->sendTextMessage("player updated:");
+                        }
+                        else
+                        {
+                            pClient->sendTextMessage("player manage fail:data process error");
+                        }
+                    }
+                    else
+                    {
+                        pClient->sendTextMessage("player manage fail:no such command");
+                    }
+                }
+                else
+                {
+                    pClient->sendTextMessage("not allowed:");
+                    qDebug() << "unauthorized access to manage player data";
+                }
+            }
+            else
+            {
+                pClient->sendTextMessage("unrecognized type:");
+                qDebug() << "unrecognized type";
+            }
         }
         else if(sCommand == "get")
         {
             if(sValue == "player")
             {
-                if(nId > 0)
+                int nTargetId = message.section(" ", 2, 2).toInt();
+                if(nTargetId > 0 && Connection.m_bAdmin)
+                {
+                    QByteArray aJson = m_ServerLogic.getPlayerData(nTargetId);
+                    QByteArray aAnswer = "player data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else if(nId > 0)
                 {
                     QByteArray aJson = m_ServerLogic.getPlayerData(nId);
-                    QByteArray aAnswer = "player data:";
+                    QByteArray aAnswer = "self data:";
                     aAnswer.append(aJson);
                     pClient->sendTextMessage(aAnswer);
                 }
@@ -226,6 +325,23 @@ void EchoServer::processTextMessage(QString message)
                 {
                     pClient->sendTextMessage("auth required:");
                     qDebug() << "unauthorized access to user data";
+                }
+            }
+            if(sValue == "users")
+            {
+///                allowed while testing
+///                if(nId > 0)
+                if(true)
+                {
+                    QByteArray aJson = m_ServerLogic.getUsersAllData();
+                    QByteArray aAnswer = "users data:";
+                    aAnswer.append(aJson);
+                    pClient->sendTextMessage(aAnswer);
+                }
+                else
+                {
+                    pClient->sendTextMessage("auth required:");
+                    qDebug() << "unauthorized access to people";
                 }
             }
             if(sValue == "people")
