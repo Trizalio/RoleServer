@@ -29,6 +29,7 @@ struct SConnection
     {}
     int m_nId = 0;
     bool m_bAdmin = false;
+    int m_nConnectedId = 0;
 };
 
 class EchoServer : public QObject
@@ -54,7 +55,9 @@ private Q_SLOTS:
 
 private:
 
-    std::unordered_map<QWebSocket*, SConnection> m_ConnectionToPlayerId;
+    std::unordered_map<std::string, int> m_HashToPlayerId;
+    std::unordered_map<QWebSocket*, SConnection> m_ConnectionToPlayerConnection;
+    std::unordered_map<int, QWebSocket*> m_PlayerIdToConnection;
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     bool m_debug;
@@ -62,6 +65,8 @@ private:
 
     QString m_sValue;
     CServerLogic m_ServerLogic;
+
+    qint64 m_HashGenerated;
 };
 
 #endif //ECHOSERVER_H

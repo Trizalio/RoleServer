@@ -4,11 +4,12 @@ QT_USE_NAMESPACE
 
 EchoServer::EchoServer(CSqlConnector *pSqlConnector, quint16 port, bool debug, QObject *parent) :
     QObject(parent),
-    m_ServerLogic(pSqlConnector),
     m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Echo Server"),
                                             QWebSocketServer::NonSecureMode, this)),
     m_clients(),
-    m_debug(debug)
+    m_debug(debug),
+    m_ServerLogic(pSqlConnector),
+    m_HashGenerated(0)
 //    m_Orm(new CSqlConnector("tcp://127.0.0.1:3306", "root", "3421Dark"))
 {
     if (m_pWebSocketServer->listen(QHostAddress::Any, port)) {
@@ -79,10 +80,12 @@ void EchoServer::processTextMessage(QString message)
     {
         QString sCommand = message.section(" ", 0, 0);
         QString sValue = message.section(" ", 1, 1);
-        SConnection Connection;
-        if(m_ConnectionToPlayerId.count(pClient))
+
+        SConnection EmptyConnection;
+        SConnection& Connection = EmptyConnection;
+        if(m_ConnectionToPlayerConnection.count(pClient))
         {
-            Connection = m_ConnectionToPlayerId[pClient];
+            Connection = m_ConnectionToPlayerConnection[pClient];
         }
         int nId = Connection.m_nId; /// TODO: remove legacy
         qDebug() << "Command:" << sCommand << "sValue:" << sValue;
@@ -97,7 +100,8 @@ void EchoServer::processTextMessage(QString message)
                 int nNewId = Player.m_nId;
                 if(nNewId)
                 {
-                    m_ConnectionToPlayerId[pClient] = SConnection(nNewId, Player.m_bAdmin);
+                    m_ConnectionToPlayerConnection[pClient] = SConnection(nNewId, Player.m_bAdmin);
+                    m_PlayerIdToConnection[nNewId] = pClient;
                     QByteArray aAnswer = "login ok:";
                     if(Player.m_bAdmin)
                     {
@@ -115,10 +119,11 @@ void EchoServer::processTextMessage(QString message)
             }
             else if(sValue == "logout")
             {
-                m_ConnectionToPlayerId.erase(pClient);
+                m_ConnectionToPlayerConnection.erase(pClient);
+                m_PlayerIdToConnection.erase(nId);
                 pClient->sendTextMessage("logout ok:");
             }
-            if(sValue == "logas")
+            else if(sValue == "logas")
             {
                 if(Connection.m_bAdmin)
                 {
@@ -128,7 +133,8 @@ void EchoServer::processTextMessage(QString message)
                     {
                         if(!Player.m_bAdmin)
                         {
-                            m_ConnectionToPlayerId[pClient] = SConnection(Player.m_nId, false);
+                            m_ConnectionToPlayerConnection[pClient] = SConnection(Player.m_nId, false);
+                            m_PlayerIdToConnection[Player.m_nId] = pClient;
                             pClient->sendTextMessage("logas ok:");
                         }
                         else
@@ -286,6 +292,40 @@ void EchoServer::processTextMessage(QString message)
                 {
                     pClient->sendTextMessage("not allowed:");
                     qDebug() << "unauthorized access to manage credential data";
+                }
+            }
+            else if(sValue == "qr")
+            {
+                qDebug() << "qr action";
+                QString sAction = message.section(" ", 2);
+                if(Connection.m_nConnectedId)
+                {
+                    if(m_PlayerIdToConnection.count(Connection.m_nConnectedId) > 0)
+                    {
+                        QWebSocket* pTargetConnection = m_PlayerIdToConnection[Connection.m_nConnectedId];
+                        qDebug() << "sAction" << sAction;
+                        if(sAction == "Взять анализ крови")
+                        {
+                            pTargetConnection->sendTextMessage("read: {\"text\": \"У Вас взяли анализ крови, Вы чувствуете лёгкую слабость ближайшие 15 минут\"}");
+                            pClient->sendTextMessage("qr action accepted:");
+                            qDebug() << "qr action accepted";
+                        }
+                        else
+                        {
+                            pClient->sendTextMessage("qr action unknown:");
+                            qDebug() << "qr action unknown";
+                        }
+                    }
+                    else
+                    {
+                        pClient->sendTextMessage("target not found:");
+                        qDebug() << "target not found";
+                    }
+                }
+                else
+                {
+                    pClient->sendTextMessage("no connection:");
+                    qDebug() << "no connection";
                 }
             }
             else
@@ -449,6 +489,45 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to projects";
                 }
             }
+            if(sValue == "qr")
+            {
+                QString sData = message.section(" ", 2).toUtf8();
+                if(sData.isEmpty())
+                {
+                    if(nId > 0)
+                    {
+                        QString sTime = QString::number(QDateTime::currentMSecsSinceEpoch() + m_HashGenerated++);
+                        QString sHash = QCryptographicHash::hash(sTime.toUtf8(), QCryptographicHash::Md5).toHex();
+                        m_HashToPlayerId[sHash.toStdString()] = nId;
+                        pClient->sendTextMessage("qr data:{\"value\": \"" + sHash + "\"}");
+                        qDebug() << "sent qr hash" << sHash;
+                    }
+                    else
+                    {
+                        pClient->sendTextMessage("auth required:");
+                        qDebug() << "unauthorized access to qr";
+                    }
+                }
+                else
+                {
+                    qDebug() << "qr red" << sData;
+                    if(m_HashToPlayerId.count(sData.toStdString()))
+                    {
+                        int QrId = m_HashToPlayerId[sData.toStdString()];
+                        m_ConnectionToPlayerConnection[pClient].m_nConnectedId = QrId;
+                        SPlayer targetPlayer = m_ServerLogic.getPlayerById(QrId);
+                        pClient->sendTextMessage(QString(("qr recognised:{\"object\": \"" + targetPlayer.m_sSurname
+                                             + " "  + targetPlayer.m_sName
+                                             + " "  + targetPlayer.m_sPatronymic
+                                            + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}").c_str()));
+                    }
+                    else
+                    {
+                        pClient->sendTextMessage("qr unrecognised:");
+                    }
+
+                }
+            }
         }
         /*if(message == "test")
         {
@@ -511,7 +590,7 @@ void EchoServer::processBinaryMessage(QByteArray message)
 void EchoServer::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    m_ConnectionToPlayerId.erase(pClient);
+    m_ConnectionToPlayerConnection.erase(pClient);
     if (m_debug)
         qDebug() << "socketDisconnected:" << pClient;
     if (pClient) {
