@@ -1,6 +1,4 @@
 #include "scredential.h"
-#include <QCryptographicHash>
-#include <QDebug>
 
 #define SALT "Trizalio"
 

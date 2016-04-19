@@ -2,6 +2,8 @@
 #define SCREDENTIAL
 
 #include "cjsonserializable.h"
+#include <QCryptographicHash>
+#include <QDebug>
 
 #define CREDENTIAL_DROP_SCRIPT "DROP TABLE IF EXISTS `Credentials`;"
 #define CREDENTIAL_CREATE_SCRIPT "CREATE TABLE `Credentials` ( \

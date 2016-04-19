@@ -54,7 +54,7 @@ HEADERS += \
     orm/sql_objects/scredential.h \
     orm/sql_objects/smessage.h \
     server/cserverlogic.h \
-    orm/sql_objects/sdialogue.h \
+    #orm/sql_objects/sdialogue.h \
     orm/aggregation_objects/sdialogue.h \
     orm/sql_objects/sgroup.h \
     orm/sql_objects/srole.h \
