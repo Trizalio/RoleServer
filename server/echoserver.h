@@ -11,6 +11,7 @@
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
 #include <QtCore/QDebug>
+#include <QDateTime>
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -36,7 +37,7 @@ class EchoServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit EchoServer(CSqlConnector* pSqlConnector, quint16 port, bool debug = false, QObject *parent = Q_NULLPTR);
+    explicit EchoServer(COrm *pOrm, quint16 port, bool debug = false, QObject *parent = Q_NULLPTR);
     ~EchoServer();
 
 

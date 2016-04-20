@@ -9,7 +9,7 @@
 class CServerLogic
 {
 public:
-    CServerLogic(CSqlConnector* pSqlConnector);
+    CServerLogic(COrm *pOrm);
 
     SPlayer login(std::string sLogin, std::string sPassword);
     SPlayer getPlayerById(int nId);
@@ -37,7 +37,7 @@ public:
 private:
     QByteArray getJsonFromUser(SUser& User);
 
-    COrm m_Orm;
+    COrm* m_pOrm;
 };
 
 #endif // CSERVERLOGIC_H

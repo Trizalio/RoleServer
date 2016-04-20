@@ -1,7 +1,7 @@
 #include "cserverlogic.h"
 
-CServerLogic::CServerLogic(CSqlConnector *pSqlConnector):
-    m_Orm(pSqlConnector)
+CServerLogic::CServerLogic(COrm *pOrm):
+    m_pOrm(pOrm)
 {
 
 }
@@ -9,14 +9,14 @@ CServerLogic::CServerLogic(CSqlConnector *pSqlConnector):
 SPlayer CServerLogic::login(std::string sLogin, std::string sPassword)
 {
     qDebug() << __FUNCTION__;
-    SPlayer Player = m_Orm.findPlayerByLoginAndPassHash(sLogin, sPassword);
+    SPlayer Player = m_pOrm->findPlayerByLoginAndPassHash(sLogin, sPassword);
     return Player;
 }
 
 SPlayer CServerLogic::getPlayerById(int nId)
 {
     qDebug() << __FUNCTION__;
-    SPlayer Player = m_Orm.findPlayerById(nId);
+    SPlayer Player = m_pOrm->findPlayerById(nId);
 
     return Player;
 }
@@ -24,7 +24,7 @@ SPlayer CServerLogic::getPlayerById(int nId)
 QByteArray CServerLogic::getPlayerData(int nId)
 {
     qDebug() << __FUNCTION__;
-    SPlayer Player = m_Orm.findPlayerById(nId);
+    SPlayer Player = m_pOrm->findPlayerById(nId);
 
     return Player.getJson();
 }
@@ -32,7 +32,7 @@ QByteArray CServerLogic::getPlayerData(int nId)
 QByteArray CServerLogic::getPlayersAll()
 {
     qDebug() << __FUNCTION__;
-    std::vector<SPlayer> aPlayers = m_Orm.selectPlayersAll();
+    std::vector<SPlayer> aPlayers = m_pOrm->selectPlayersAll();
 
     QJsonArray jArray;
     for(size_t i = 0; i < aPlayers.size(); ++i)
@@ -51,14 +51,14 @@ QByteArray CServerLogic::getPlayersAll()
 QByteArray CServerLogic::getUserDataByWatcher(int nId, int nWatcherId)
 {
     qDebug() << __FUNCTION__;
-    CUser User = m_Orm.getUserInfoById(nId, nWatcherId);
+    CUser User = m_pOrm->getUserInfoById(nId, nWatcherId);
     return User.getJson();
 }
 
 QByteArray CServerLogic::getUsersAllData()
 {
     qDebug() << __FUNCTION__;
-    std::vector<SUser> Users = m_Orm.selectUserAll();
+    std::vector<SUser> Users = m_pOrm->selectUserAll();
 
     QJsonArray jArray;
     for(size_t i = 0; i < Users.size(); ++i)
@@ -77,14 +77,14 @@ QByteArray CServerLogic::getUsersAllData()
 QByteArray CServerLogic::getProjectDataByWatcher(int nId, int nWatcherId)
 {
     qDebug() << __FUNCTION__;
-    CGroup Group = m_Orm.getGroupInfoByIdByWatcher(nId, nWatcherId);
+    CGroup Group = m_pOrm->getGroupInfoByIdByWatcher(nId, nWatcherId);
     return Group.getJson();
 }
 
 QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
 {
     qDebug() << __FUNCTION__;
-    std::vector<SGroup> aGroups = m_Orm.selectAllGroupsVisibleByUser(nId);
+    std::vector<SGroup> aGroups = m_pOrm->selectAllGroupsVisibleByUser(nId);
     qDebug() << aGroups.size();
 
 
@@ -105,7 +105,7 @@ QByteArray CServerLogic::getProjectsDataByWatcher(int nId)
 QByteArray CServerLogic::getProjectsAllData()
 {
     qDebug() << __FUNCTION__;
-    std::vector<SGroup> aGroups = m_Orm.selectGroupsAll();
+    std::vector<SGroup> aGroups = m_pOrm->selectGroupsAll();
 
 
     QJsonArray jArray;
@@ -125,7 +125,7 @@ QByteArray CServerLogic::getProjectsAllData()
 QByteArray CServerLogic::getNewsAllByWatcher(int nId)
 {
     qDebug() << __FUNCTION__;
-    std::vector<CNews> aNews = m_Orm.selectNewsAllVisibleByUser(nId);
+    std::vector<CNews> aNews = m_pOrm->selectNewsAllVisibleByUser(nId);
 
     QJsonArray jArray;
     for(size_t i = 0; i < aNews.size(); ++i)
@@ -149,7 +149,7 @@ bool CServerLogic::addPlayer(QByteArray jPlayer)
     {
         return false;
     }
-    m_Orm.insertPlayer(Player);
+    m_pOrm->insertPlayer(Player);
     return true;
 }
 
@@ -159,7 +159,7 @@ bool CServerLogic::updatePlayer(QByteArray jPlayer)
     SPlayer Player = SPlayer::getObjectFromJson(jPlayer);
     if(Player.m_nId)
     {
-        m_Orm.updatePlayer(Player);
+        m_pOrm->updatePlayer(Player);
         return true;
     }
     return false;
@@ -171,7 +171,7 @@ bool CServerLogic::updatePlayerCredential(QByteArray jCredential)
     SCredential Credential = SCredential::getObjectFromJson(jCredential);
     if(Credential.m_nId)
     {
-        m_Orm.updateCredential(Credential);
+        m_pOrm->updateCredential(Credential);
         return true;
     }
     return false;
@@ -179,7 +179,7 @@ bool CServerLogic::updatePlayerCredential(QByteArray jCredential)
 
 bool CServerLogic::deletePlayer(int nPlayerId)
 {
-    //    m_Orm.insertUser(User);
+    //    m_pOrm->insertUser(User);
         return false;
 }
 
@@ -191,7 +191,7 @@ bool CServerLogic::addUser(QByteArray jUser)
     {
         return false;
     }
-    m_Orm.insertUser(User);
+    m_pOrm->insertUser(User);
     return true;
 }
 
@@ -201,7 +201,7 @@ bool CServerLogic::updateUser(QByteArray jUser)
     SUser User = SUser::getObjectFromJson(jUser);
     if(User.m_nId)
     {
-        m_Orm.updateUser(User);
+        m_pOrm->updateUser(User);
         return true;
     }
     return false;
@@ -209,7 +209,7 @@ bool CServerLogic::updateUser(QByteArray jUser)
 
 bool CServerLogic::deleteUser(int nUserId)
 {
-//    m_Orm.insertUser(User);
+//    m_pOrm->insertUser(User);
     return false;
 }
 

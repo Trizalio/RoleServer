@@ -2,13 +2,13 @@
 
 QT_USE_NAMESPACE
 
-EchoServer::EchoServer(CSqlConnector *pSqlConnector, quint16 port, bool debug, QObject *parent) :
+EchoServer::EchoServer(COrm *pOrm, quint16 port, bool debug, QObject *parent) :
     QObject(parent),
     m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Echo Server"),
                                             QWebSocketServer::NonSecureMode, this)),
     m_clients(),
     m_debug(debug),
-    m_ServerLogic(pSqlConnector),
+    m_ServerLogic(pOrm),
     m_HashGenerated(0)
 //    m_Orm(new CSqlConnector("tcp://127.0.0.1:3306", "root", "3421Dark"))
 {

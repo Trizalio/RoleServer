@@ -5,6 +5,7 @@
 #include "server/echoserver.h"
 #include "console.h"
 #include "cplanetthread.h"
+#include "cconnectionkeeper.h"
 
 int main(int argc, char *argv[])
 {
@@ -41,7 +42,10 @@ int main(int argc, char *argv[])
     std::string sMysqlPass = parser.value(mysqlPasswordOption).toStdString();
 
     qDebug() << sMysqlPass.c_str();
-    EchoServer *server = new EchoServer(new CSqlConnector("tcp://127.0.0.1:" + sMysqlPort, sMysqlLogin, sMysqlPass), nWebSocketPort, debug);
+    COrm* pOrm = new COrm(new CSqlConnector("tcp://127.0.0.1:" + sMysqlPort, sMysqlLogin, sMysqlPass));
+
+    CConnectionKeeper* pConnectionKeeper = new CConnectionKeeper(pOrm);
+    EchoServer *server = new EchoServer(pOrm, nWebSocketPort, debug);
     QObject::connect(server, &EchoServer::closed, &a, &QCoreApplication::quit);
 
     Console console;
