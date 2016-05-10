@@ -1,5 +1,10 @@
 #include "cgroup.h"
 
+CGroup::CGroup()
+{
+
+}
+
 CGroup::CGroup(SGroup Group):
     m_Group(Group)
 {

@@ -6,6 +6,7 @@
 #include "console.h"
 #include "cplanetthread.h"
 #include "cconnectionkeeper.h"
+#include "tick/ctickmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -56,6 +57,13 @@ int main(int argc, char *argv[])
 
     CPlanetThread PlanetThread;
     PlanetThread.start();
+
+    QTimer* pTimer = new QTimer();
+    CTickManager* pTickManager =  new CTickManager(pOrm);
+    QObject::connect(pTimer, SIGNAL(timeout()), pTickManager, SLOT(tick()));
+    QObject::connect(pTickManager, SIGNAL(statusChange(QByteArray,int)), server, SLOT(sendStatusChange(QByteArray,int)));
+    QObject::connect(pTickManager, SIGNAL(statusUpdate(int)), server, SLOT(sendStatusUpdate(int)));
+    pTimer->start(1000);
 
     return a.exec();
 }

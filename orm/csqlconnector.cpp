@@ -85,7 +85,7 @@ bool CSqlConnector::connect()
         }
         catch(sql::SQLException e)
         {
-            qDebug() << "Failed to connect";
+            qDebug() << "Failed to connect" << e.getErrorCode() << e.getSQLState().c_str() << e.getSQLStateCStr() << e.what();
         }
     }
     else

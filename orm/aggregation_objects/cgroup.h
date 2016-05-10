@@ -8,6 +8,7 @@
 class CGroup : public CJsonSerializable
 {
 public:
+    CGroup();
     CGroup(SGroup Group);
 
     void addUser(SUser User);

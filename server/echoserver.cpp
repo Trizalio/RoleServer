@@ -19,6 +19,11 @@ EchoServer::EchoServer(COrm *pOrm, quint16 port, bool debug, QObject *parent) :
                 this, &EchoServer::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &EchoServer::closed);
     }
+
+    connect(&m_ServerLogic, SIGNAL(statusChange(QByteArray,int)),
+            this, SLOT(sendStatusChange(QByteArray,int)));
+    connect(&m_ServerLogic, SIGNAL(qrClosed(int)),
+            this, SLOT(sendQrClose(int)));
 }
 
 EchoServer::~EchoServer()
@@ -55,6 +60,50 @@ void EchoServer::play()
             qDebug() << "play";
             File.close();
         }
+    }
+}
+
+void EchoServer::sendStatusChange(QByteArray sStatusChange, int nPlayerId)
+{
+    qDebug() << __FUNCTION__;
+    if(m_PlayerIdToConnection.count(nPlayerId) > 0)
+    {
+        QWebSocket* pTargetConnection = m_PlayerIdToConnection[nPlayerId];
+        qDebug() << "sStatusChange" << sStatusChange;
+        pTargetConnection->sendTextMessage("read: {\"text\": \"" + sStatusChange + "\"}");
+        pTargetConnection->sendTextMessage("update status:");
+    }
+    else
+    {
+        qDebug() << "target not found";
+    }
+}
+
+void EchoServer::sendStatusUpdate(int nPlayerId)
+{
+    qDebug() << __FUNCTION__;
+    if(m_PlayerIdToConnection.count(nPlayerId) > 0)
+    {
+        QWebSocket* pTargetConnection = m_PlayerIdToConnection[nPlayerId];
+        pTargetConnection->sendTextMessage("update status:");
+    }
+    else
+    {
+        qDebug() << "target not found";
+    }
+}
+
+void EchoServer::sendQrClose(int nPlayerId)
+{
+    qDebug() << __FUNCTION__;
+    if(m_PlayerIdToConnection.count(nPlayerId) > 0)
+    {
+        QWebSocket* pTargetConnection = m_PlayerIdToConnection[nPlayerId];
+        pTargetConnection->sendTextMessage("qr close:");
+    }
+    else
+    {
+        qDebug() << "target not found";
     }
 }
 
@@ -96,14 +145,17 @@ void EchoServer::processTextMessage(QString message)
             {
                 QString sLogin = message.section(" ", 2, 2);
                 QString sPasswordHash = message.section(" ", 3, 3);
-                SPlayer Player = m_ServerLogic.login(sLogin.toStdString(), sPasswordHash.toStdString());
-                int nNewId = Player.m_nId;
+                QPair<int, bool> IdAndIsAdmin = m_ServerLogic.login(sLogin.toStdString(), sPasswordHash.toStdString());
+//                SPlayer Player = m_ServerLogic.login(sLogin.toStdString(), sPasswordHash.toStdString());
+
+                int nNewId = IdAndIsAdmin.first;
+                bool bAdmin = IdAndIsAdmin.second;
                 if(nNewId)
                 {
-                    m_ConnectionToPlayerConnection[pClient] = SConnection(nNewId, Player.m_bAdmin);
+                    m_ConnectionToPlayerConnection[pClient] = SConnection(nNewId, bAdmin);
                     m_PlayerIdToConnection[nNewId] = pClient;
                     QByteArray aAnswer = "login ok:";
-                    if(Player.m_bAdmin)
+                    if(bAdmin)
                     {
                         aAnswer.append("admin");
 
@@ -128,13 +180,14 @@ void EchoServer::processTextMessage(QString message)
                 if(Connection.m_bAdmin)
                 {
                     int nTargetId = message.section(" ", 2, 2).toInt();
-                    SPlayer Player = m_ServerLogic.getPlayerById(nTargetId);
-                    if(Player.m_nId > 0)
+//                    SPlayer Player = m_ServerLogic.getPlayerById(nTargetId);
+                    bool PlayerIsAdmin = m_ServerLogic.CheckAdminByPlayerId(nTargetId);
+                    if(PlayerIsAdmin)
                     {
-                        if(!Player.m_bAdmin)
+                        if(PlayerIsAdmin == false)
                         {
-                            m_ConnectionToPlayerConnection[pClient] = SConnection(Player.m_nId, false);
-                            m_PlayerIdToConnection[Player.m_nId] = pClient;
+                            m_ConnectionToPlayerConnection[pClient] = SConnection(nTargetId, PlayerIsAdmin);
+                            m_PlayerIdToConnection[nTargetId] = pClient;
                             pClient->sendTextMessage("logas ok:");
                         }
                         else
@@ -294,39 +347,49 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to manage credential data";
                 }
             }
+            else if(sValue == "healthloss")
+            {
+                m_ServerLogic.healthLossByPlayerId(nId);
+            }
+            else if(sValue == "psyloss")
+            {
+                m_ServerLogic.psyLossByPlayerId(nId);
+            }
             else if(sValue == "qr")
             {
                 qDebug() << "qr action";
                 QString sAction = message.section(" ", 2);
-                if(Connection.m_nConnectedId)
-                {
-                    if(m_PlayerIdToConnection.count(Connection.m_nConnectedId) > 0)
-                    {
-                        QWebSocket* pTargetConnection = m_PlayerIdToConnection[Connection.m_nConnectedId];
-                        qDebug() << "sAction" << sAction;
-                        if(sAction == "Взять анализ крови")
-                        {
-                            pTargetConnection->sendTextMessage("read: {\"text\": \"У Вас взяли анализ крови, Вы чувствуете лёгкую слабость ближайшие 15 минут\"}");
-                            pClient->sendTextMessage("qr action accepted:");
-                            qDebug() << "qr action accepted";
-                        }
-                        else
-                        {
-                            pClient->sendTextMessage("qr action unknown:");
-                            qDebug() << "qr action unknown";
-                        }
-                    }
-                    else
-                    {
-                        pClient->sendTextMessage("target not found:");
-                        qDebug() << "target not found";
-                    }
-                }
-                else
-                {
-                    pClient->sendTextMessage("no connection:");
-                    qDebug() << "no connection";
-                }
+                m_ServerLogic.actionByPlayerId(sAction.toStdString(), nId);
+
+//                if(Connection.m_nConnectedId)
+//                {
+//                    if(m_PlayerIdToConnection.count(Connection.m_nConnectedId) > 0)
+//                    {
+//                        QWebSocket* pTargetConnection = m_PlayerIdToConnection[Connection.m_nConnectedId];
+//                        qDebug() << "sAction" << sAction;
+//                        if(sAction == "Взять анализ крови")
+//                        {
+//                            pTargetConnection->sendTextMessage("read: {\"text\": \"У Вас взяли анализ крови, Вы чувствуете лёгкую слабость ближайшие 15 минут\"}");
+//                            pClient->sendTextMessage("qr action accepted:");
+//                            qDebug() << "qr action accepted";
+//                        }
+//                        else
+//                        {
+//                            pClient->sendTextMessage("qr action unknown:");
+//                            qDebug() << "qr action unknown";
+//                        }
+//                    }
+//                    else
+//                    {
+//                        pClient->sendTextMessage("target not found:");
+//                        qDebug() << "target not found";
+//                    }
+//                }
+//                else
+//                {
+//                    pClient->sendTextMessage("no connection:");
+//                    qDebug() << "no connection";
+//                }
             }
             else
             {
@@ -381,7 +444,7 @@ void EchoServer::processTextMessage(QString message)
                 if(true)
                 {
                     int nTargetId = message.section(" ", 2, 2).toInt();
-                    QByteArray aJson = m_ServerLogic.getUserDataByWatcher(nTargetId, nId);
+                    QByteArray aJson = m_ServerLogic.getUserByIdVisibleByPlayerId(nTargetId, nId);
                     QByteArray aAnswer = "user data:";
                     aAnswer.append(aJson);
 //                    qDebug() << aJson;
@@ -438,7 +501,7 @@ void EchoServer::processTextMessage(QString message)
                 {
                     int nTargetId = message.section(" ", 2, 2).toInt();
                     /// TODO access check
-                    QByteArray aJson = m_ServerLogic.getProjectDataByWatcher(nTargetId, nId);
+                    QByteArray aJson = m_ServerLogic.getProjectByIdVisibleByPlayerId(nTargetId, nId);
                     QByteArray aAnswer = "project data:";
                     aAnswer.append(aJson);
                     pClient->sendTextMessage(aAnswer);
@@ -458,7 +521,7 @@ void EchoServer::processTextMessage(QString message)
                     /// TODO change for getProjectsDataForUser(...);
 //
                     QByteArray aJson;
-                    aJson = m_ServerLogic.getProjectsDataByWatcher(nId);
+                    aJson = m_ServerLogic.getProjectsAllVisibleByPlayerId(nId);
 //                    QByteArray aJson = m_ServerLogic.getProjectsAllData();
                     QByteArray aAnswer = "projects data:";
                     aAnswer.append(aJson);
@@ -477,7 +540,7 @@ void EchoServer::processTextMessage(QString message)
                 if(true)
                 {
                     /// TODO change for getProjectsDataForUser(...);
-                    QByteArray aJson = m_ServerLogic.getNewsAllByWatcher(nId);
+                    QByteArray aJson = m_ServerLogic.getNewsAllVisibleByPlayerId(nId);
 //                    QByteArray aJson = m_ServerLogic.getProjectsAllData();
                     QByteArray aAnswer = "news data:";
                     aAnswer.append(aJson);
@@ -489,6 +552,14 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to projects";
                 }
             }
+            if(sValue == "status")
+            {
+                QByteArray aJson = m_ServerLogic.getUserStatusVisibleByPlayerId(nId);
+                QByteArray aAnswer = "status data:";
+                aAnswer.append(aJson);
+                pClient->sendTextMessage(aAnswer);
+                qDebug() << "sent status" << aAnswer;
+            }
             if(sValue == "qr")
             {
                 QString sData = message.section(" ", 2).toUtf8();
@@ -496,11 +567,15 @@ void EchoServer::processTextMessage(QString message)
                 {
                     if(nId > 0)
                     {
-                        QString sTime = QString::number(QDateTime::currentMSecsSinceEpoch() + m_HashGenerated++);
-                        QString sHash = QCryptographicHash::hash(sTime.toUtf8(), QCryptographicHash::Md5).toHex();
-                        m_HashToPlayerId[sHash.toStdString()] = nId;
-                        pClient->sendTextMessage("qr data:{\"value\": \"" + sHash + "\"}");
-                        qDebug() << "sent qr hash" << sHash;
+                        QByteArray aJson = m_ServerLogic.genereateNewHashForUserByPlayerId(nId);
+                        QByteArray aAnswer = "qr data:";
+                        aAnswer.append(aJson);
+                        pClient->sendTextMessage(aAnswer);
+//                        QString sTime = QString::number(QDateTime::currentMSecsSinceEpoch() + m_HashGenerated++);
+//                        QString sHash = QCryptographicHash::hash(sTime.toUtf8(), QCryptographicHash::Md5).toHex();
+//                        m_HashToPlayerId[sHash.toStdString()] = nId;
+//                        pClient->sendTextMessage("qr data:{\"value\": \"" + sHash + "\"}");
+                        qDebug() << "sent qr hash" << aJson;
                     }
                     else
                     {
@@ -511,19 +586,26 @@ void EchoServer::processTextMessage(QString message)
                 else
                 {
                     qDebug() << "qr red" << sData;
-                    if(m_HashToPlayerId.count(sData.toStdString()))
+
+                    QByteArray aJson = m_ServerLogic.useItemByHashByPlayerId(sData.toStdString(), nId);
+                    if(aJson.isEmpty() == false)
                     {
-                        int QrId = m_HashToPlayerId[sData.toStdString()];
-                        m_ConnectionToPlayerConnection[pClient].m_nConnectedId = QrId;
-                        SPlayer targetPlayer = m_ServerLogic.getPlayerById(QrId);
-                        pClient->sendTextMessage(QString(("qr recognised:{\"object\": \"" + targetPlayer.m_sSurname
-                                             + " "  + targetPlayer.m_sName
-                                             + " "  + targetPlayer.m_sPatronymic
-                                            + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}").c_str()));
+                        QByteArray aAnswer = "qr recognised:";
+                        aAnswer.append(aJson);
+                        pClient->sendTextMessage(aAnswer);
+                        qDebug() << "qr recognised" << aJson;
+//                        int QrId = m_HashToPlayerId[sData.toStdString()];
+//                        m_ConnectionToPlayerConnection[pClient].m_nConnectedId = QrId;
+//                        SPlayer targetPlayer = m_ServerLogic.getPlayerById(QrId);
+//                        pClient->sendTextMessage(QString(("qr recognised:{\"object\": \"" + targetPlayer.m_sSurname
+//                                             + " "  + targetPlayer.m_sName
+//                                             + " "  + targetPlayer.m_sPatronymic
+//                                            + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}").c_str()));
                     }
                     else
                     {
                         pClient->sendTextMessage("qr unrecognised:");
+                        qDebug() << "qr unrecognised";
                     }
 
                 }

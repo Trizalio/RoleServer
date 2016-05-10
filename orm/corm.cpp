@@ -6,16 +6,21 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     // №Terra04C24
     dropTables();
     createTables();
-    SUser User2("Олег","Пчёлкин","Борисович","2074-09-03",
-               "Начальник терраформационной базы","Обращаться через секретаря");
-    SUser User3("Лаврентий","Лютов","Тимурович","2064-12-05",
-               "Личный секретарь начальника базы","Пожалуйста, составляйте обращения по протоколу, чётко и ясно. Не верно обормленные заявки рассматриваться не будут");
-    SUser User4("Никифор","Данилов","Григорьевич","2061-08-10",
-               "Начальник по техническому обеспечению","Пожалуйста, подавая заявки на получение образцов прикрепляйте план работ!");
-    SUser User5("Ариадна","Лебедева","Вечеславовна","2077-06-07",
-               "Главный программист","Рада помочь!");
-    SUser User6("Ильин","Илья","Вадимович","2070-10-13",
-                "Уборщик","По помытому не ходите!");
+    SUser User2("Олег","Пчёлкин","Борисович", MALE,"2074-09-03",
+               "Менеджмент","Начальник терраформационной базы","Обращаться через секретаря");
+    SUser User3("Лаврентий","Лютов","Тимурович", MALE,"2064-12-05",
+               "Работа с бумагами","Личный секретарь начальника базы","Пожалуйста, составляйте обращения по протоколу, чётко и ясно. Не верно обормленные заявки рассматриваться не будут");
+    SUser User4("Никифор","Данилов","Григорьевич", MALE,"2061-08-10",
+               "Сохранение ресурсов","Начальник по техническому обеспечению","Пожалуйста, подавая заявки на получение образцов прикрепляйте план работ!");
+    SUser User5("Ариадна","Лебедева","Вечеславовна", FEMALE,"2077-06-07",
+               "Информационная безопасность","Главный программист","Рада помочь!");
+    SUser User6("Ильин","Илья","Вадимович", MALE,"2070-10-13",
+                "Разведка","Уборщик","По помытому не ходите!");
+    SUserStat UserStat2(5, 5, 10, -1, 0);
+    SUserStat UserStat3(5, 4, 30, -1, 0);
+    SUserStat UserStat4(5, 3, 50, -1, 0);
+    SUserStat UserStat5(5, 2, 70, -1, 0);
+    SUserStat UserStat6(5, 1, 100, -1, 0);
     SPlayer Player1("Орлов", "Михаил", "Юрьевич", "Тризалио",
                    "1991-03-21", "Администратор", true);
     SPlayer Player2(1, "Парамон", "Щербаков", "Кириллович", "Mr. White",
@@ -46,11 +51,11 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     SNews News3(4, "2107-03-27", "Обмен", "Обменяю полное собрание сочинений Джорджа Мартина, 76 томов, 23 гигабайта. Комиксы и интерактивки не предлагать!", false, false);
     SNews News4(5, "2109-11-07", "Пора действовать", "Время уходит, каждый день снижает шанс нашей миссии. Поторопитсь.", true, true);
     qDebug() << "insert";
-    insertUser(User2);
-    insertUser(User3);
-    insertUser(User4);
-    insertUser(User5);
-    insertUser(User6);
+    insertUser(User2, UserStat2);
+    insertUser(User3, UserStat3);
+    insertUser(User4, UserStat4);
+    insertUser(User5, UserStat5);
+    insertUser(User6, UserStat6);
     qDebug() << "User";
     insertPlayer(Player1);
     insertPlayer(Player2);
@@ -90,23 +95,65 @@ COrm::COrm(CSqlConnector *pSqlConnector):
     }*/
 }
 
-void COrm::insertUser(SUser& User)
+//void COrm::insertHash(SHash &Hash)
+//{
+//    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Hashs` \
+//(`hash`) VALUES \
+//(?);");
+//    pPreparedStatement->setString(1, Hash.m_sHash);
+//    pPreparedStatement->executeUpdate();
+//    delete pPreparedStatement;
+//}
+
+void COrm::insertUser(SUser& User, SUserStat &UserStat)
 {
+    qDebug() << __FUNCTION__;
+    unsigned short i = 1;
     sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Users` \
-(`name`,`surname`,`patronymic`,`birth_date`,`profession`,`description`) VALUES \
-(?,?,?,?,?,?);");
-    pPreparedStatement->setString(1, User.m_sName);
-    pPreparedStatement->setString(2, User.m_sSurname);
-    pPreparedStatement->setString(3, User.m_sPatronymic);
-    pPreparedStatement->setString(4, User.m_sBirthDate);
-    pPreparedStatement->setString(5, User.m_sProfession);
-    pPreparedStatement->setString(6, User.m_sDescription);
+(`name`,`surname`,`patronymic`,`male`,`birth_date`,`specialty`,`profession`,`description`) VALUES \
+(?,?,?,?,?,?,?,?);");
+    pPreparedStatement->setString(i++, User.m_sName);
+    pPreparedStatement->setString(i++, User.m_sSurname);
+    pPreparedStatement->setString(i++, User.m_sPatronymic);
+    pPreparedStatement->setInt(i++, (int)User.m_bMale);
+    pPreparedStatement->setString(i++, User.m_sBirthDate);
+    pPreparedStatement->setString(i++, User.m_sSpecialty);
+    pPreparedStatement->setString(i++, User.m_sProfession);
+    pPreparedStatement->setString(i++, User.m_sDescription);
     pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+
+    qDebug() << __FUNCTION__ << 2;
+    i = 1;
+    if(UserStat.m_nAirId)
+    {
+        pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `UserStats` \
+(`id`,`hp_max`,`hp`,`pp`,`air`,`fk_Items_id_air`) VALUES \
+(LAST_INSERT_ID(),?,?,?,?,?);");
+        pPreparedStatement->setInt(i++, UserStat.m_nHpMax);
+        pPreparedStatement->setInt(i++, UserStat.m_nHp);
+        pPreparedStatement->setInt(i++, UserStat.m_nPp);
+        pPreparedStatement->setInt(i++, UserStat.m_nAir);
+        pPreparedStatement->setInt(i++, UserStat.m_nAirId);
+    }
+    else
+    {
+        pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `UserStats` \
+(`id`,`hp_max`,`hp`,`pp`,`air`) VALUES \
+(LAST_INSERT_ID(),?,?,?,?);");
+        pPreparedStatement->setInt(i++, UserStat.m_nHpMax);
+        pPreparedStatement->setInt(i++, UserStat.m_nHp);
+        pPreparedStatement->setInt(i++, UserStat.m_nPp);
+        pPreparedStatement->setInt(i++, UserStat.m_nAir);
+    }
+    pPreparedStatement->executeUpdate();
+
     delete pPreparedStatement;
 }
 
 void COrm::insertPlayer(SPlayer &Player)
 {
+    qDebug() << __FUNCTION__;
     sql::PreparedStatement* pPreparedStatement;
     unsigned short i = 1;
     if(Player.m_nUserId)
@@ -135,6 +182,7 @@ void COrm::insertPlayer(SPlayer &Player)
 
 void COrm::insertCredential(SCredential &Credential)
 {
+    qDebug() << __FUNCTION__;
     sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Credentials` \
 (`id`,`login`,`passwordHash`) VALUES \
 (?,?,?);");
@@ -148,6 +196,7 @@ void COrm::insertCredential(SCredential &Credential)
 
 void COrm::insertMessage(SMessage &Message)
 {
+    qDebug() << __FUNCTION__;
     sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Messages` \
 (`fk_Users_id_from`,`fk_Users_id_to`,`subject`,`text`,`anonymously`) VALUES \
 (?, ?, ?, ?, ?);");
@@ -163,6 +212,7 @@ void COrm::insertMessage(SMessage &Message)
 
 void COrm::insertGroup(SGroup &Group)
 {
+    qDebug() << __FUNCTION__;
     sql::PreparedStatement* pPreparedStatement;
     unsigned short i = 1;
     if(Group.m_nParentId) {
@@ -186,6 +236,7 @@ void COrm::insertGroup(SGroup &Group)
 
 void COrm::insertRole(SRole &Role)
 {
+    qDebug() << __FUNCTION__;
     sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Roles` \
 (`fk_Users_id`,`fk_Groups_id`,`owner`) VALUES \
 (?, ?, ?);");
@@ -199,6 +250,7 @@ void COrm::insertRole(SRole &Role)
 
 void COrm::insertNews(SNews &News)
 {
+    qDebug() << __FUNCTION__;
     sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `News` \
 (`fk_Roles_id`,`created`,`subject`,`text`,`anonymously`,`shared`) VALUES \
 (?,?,?,?,?,?);");
@@ -208,6 +260,19 @@ void COrm::insertNews(SNews &News)
     pPreparedStatement->setString(4, News.m_sText);
     pPreparedStatement->setInt(5, (int)News.m_bAnonymously);
     pPreparedStatement->setInt(6, (int)News.m_bShared);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+void COrm::insertItem(SItem Item)
+{
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("INSERT INTO `Items` \
+(`json_data`,`hash`) VALUES \
+(?,?);");
+    unsigned short i = 1;
+    pPreparedStatement->setString(i++, Item.m_sJsonData);
+    pPreparedStatement->setString(i++, createUniqueHash());
     pPreparedStatement->executeUpdate();
     delete pPreparedStatement;
 }
@@ -226,6 +291,31 @@ WHERE id=?;");
     pPreparedStatement->setString(i++, User.m_sProfession);
     pPreparedStatement->setString(i++, User.m_sDescription);
     pPreparedStatement->setInt(i++, User.m_nId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+void COrm::updateUserStat(SUserStat &UserStat)
+{
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `UserStats` \
+SET `hp_max`=?,`hp`=?,`pp`=?,`air`=?,`fk_Items_id_air`=?, `stun`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, UserStat.m_nHpMax);
+    pPreparedStatement->setInt(i++, UserStat.m_nHp);
+    pPreparedStatement->setInt(i++, UserStat.m_nPp);
+    pPreparedStatement->setInt(i++, UserStat.m_nAir);
+    if(UserStat.m_nAirId)
+    {
+        pPreparedStatement->setInt(i++, UserStat.m_nAirId);
+    }
+    else
+    {
+        pPreparedStatement->setNull(i++, 0);
+    }
+    pPreparedStatement->setInt(i++, UserStat.m_nStun);
+    pPreparedStatement->setInt(i++, UserStat.m_nId);
     pPreparedStatement->executeUpdate();
     delete pPreparedStatement;
 }
@@ -296,6 +386,11 @@ login=?, passwordHash=?;");
     delete pPreparedStatement;
 }
 
+void COrm::deleteHash(int &nHashId)
+{
+
+}
+
 void COrm::deleteUser(int &nUserId)
 {
 
@@ -326,6 +421,162 @@ void COrm::deleteNews(int &nNewsId)
 
 }
 
+//SHash COrm::findHashByHashString(std::string sHash)
+//{
+//    qDebug() << __FUNCTION__;
+//    SHash Result;
+//    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+//select Hashs.id, \
+//Hashs.hash \
+//from Hashs \
+//where Hashs.hash = ?;");
+//    unsigned short i = 1;
+//    pPreparedStatement->setString(i++, sHash);
+//    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+//    while (pResult->next()) {
+//        Result = SHash(pResult->getInt("id"),
+//            pResult->getString("hash").c_str());
+//    }
+//    delete pResult;
+//    delete pPreparedStatement;
+//    return Result;
+//}
+
+SUser COrm::findUserByHashString(std::string sHash)
+{
+    qDebug() << __FUNCTION__;
+    SUser Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select Users.id, \
+Users.name, \
+Users.surname, \
+Users.patronymic, \
+Users.male, \
+Users.birth_date, \
+Users.specialty, \
+Users.profession, \
+Users.description \
+from Users \
+where Users.hash = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setString(i++, sHash.c_str());
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result = SUser(pResult->getInt("id"),
+            pResult->getString("name").c_str(),
+            pResult->getString("surname").c_str(),
+            pResult->getString("patronymic").c_str(),
+            (bool)pResult->getInt("male"),
+            pResult->getString("birth_date").c_str(),
+            pResult->getString("specialty").c_str(),
+            pResult->getString("profession").c_str(),
+            pResult->getString("description").c_str());
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+//    SHash Hash = findHashByHashString(sHash);
+    //    return findUserByHash(Hash);
+}
+
+SItem COrm::findItemByHashString(std::string sHash)
+{
+//    select * from Items where Items.hash = "b02d";
+    qDebug() << __FUNCTION__;
+    SItem Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select * \
+from Items \
+where Items.hash = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setString(i++, sHash.c_str());
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result = SItem(pResult->getInt("id"),
+            pResult->getString("json_data").c_str(),
+            pResult->getString("hash").c_str());
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+//SUser COrm::findUserByHash(SHash Hash)
+//{
+//    qDebug() << __FUNCTION__;
+//    SUser Result;
+//    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+//select Users.id, \
+//Users.name, \
+//Users.surname, \
+//Users.patronymic, \
+//Users.birth_date, \
+//Users.profession, \
+//Users.description \
+//from Users \
+//where Users.fk_Hashs_id = ?;");
+//    unsigned short i = 1;
+//    pPreparedStatement->setInt(i++, Hash.m_nId);
+//    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+//    while (pResult->next()) {
+//        Result = SUser(pResult->getInt("id"),
+//            pResult->getString("name").c_str(),
+//            pResult->getString("surname").c_str(),
+//            pResult->getString("patronymic").c_str(),
+//            pResult->getString("birth_date").c_str(),
+//            pResult->getString("profession").c_str(),
+//            pResult->getString("description").c_str());
+//    }
+//    delete pResult;
+//    delete pPreparedStatement;
+//    return Result;
+//}
+
+void COrm::setHashStringToUser(std::string sHash, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `Users` \
+SET `hash`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setString(i++, sHash.c_str());
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+void COrm::setActionHashStringToUser(std::string sHash, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `Users` \
+SET `action_hash`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setString(i++, sHash.c_str());
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+std::string COrm::getActionHashStringFromUser(int nUserId)
+{
+    qDebug() << __FUNCTION__;
+    std::string sResult;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select Users.action_hash \
+from Users \
+where Users.id = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nUserId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        sResult = pResult->getString("action_hash");
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return sResult;
+}
+
 //void COrm::deleteMessage(int &nMessageId)
 //{
 
@@ -344,12 +595,14 @@ std::vector<SUser> COrm::selectUserAll()
     sql::ResultSet* pResult = m_pCSqlConnector->executeResult("SELECT * FROM Users;");
     while (pResult->next()) {
         Result.push_back(SUser(pResult->getInt("id"),
-            pResult->getString("name").c_str(),
-            pResult->getString("surname").c_str(),
-            pResult->getString("patronymic").c_str(),
-            pResult->getString("birth_date").c_str(),
-            pResult->getString("profession").c_str(),
-            pResult->getString("description").c_str()));
+                               pResult->getString("name").c_str(),
+                               pResult->getString("surname").c_str(),
+                               pResult->getString("patronymic").c_str(),
+                               (bool)pResult->getInt("male"),
+                               pResult->getString("birth_date").c_str(),
+                               pResult->getString("specialty").c_str(),
+                               pResult->getString("profession").c_str(),
+                               pResult->getString("description").c_str()));
     }
     delete pResult;
     return Result;
@@ -373,11 +626,15 @@ std::vector<SPlayer> COrm::selectPlayersAll()
     delete pResult;
     return Result;
 }
+CUser COrm::getUserByIdVisibleByAdmin(int nId)
+{
+    return getUserById(nId);
+}
 
-CUser COrm::getUserInfoById(int nId, int nWatcherId)
+CUser COrm::getUserByIdVisibleByUser(int nId, int nWatcherUserId)
 {
     CUser User = CUser(findUserById(nId));
-    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherId);
+    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherUserId);
     std::vector<SRole> UserRoles = findRolesByUserId(nId);
     for(size_t i = 0; i < UserRoles.size(); ++i)
     {
@@ -394,10 +651,10 @@ CUser COrm::getUserInfoById(int nId, int nWatcherId)
     return User;
 }
 
-CGroup COrm::getGroupInfoByIdByWatcher(int nId, int nWatcherId)
+CGroup COrm::getGroupInfoByIdVisibleByUser(int nId, int nWatcherUserId)
 {
     qDebug() << __FUNCTION__;
-    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherId);
+    std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherUserId);
     for(size_t j = 0; j < aGroupsVisibleByWatcher.size(); ++j)
     {
 //        qDebug() << (aGroupsVisibleByWatcher.at(j).m_nId << nId;
@@ -407,6 +664,11 @@ CGroup COrm::getGroupInfoByIdByWatcher(int nId, int nWatcherId)
         }
     }
     return CGroup(SGroup());
+}
+
+CGroup COrm::getGroupInfoByIdVisibleByAdmin(int nId)
+{
+    return getGroupInfoById(nId);
 }
 
 CGroup COrm::getGroupInfoById(int nId)
@@ -420,26 +682,70 @@ CGroup COrm::getGroupInfoById(int nId)
     return Group;
 }
 
+std::vector<CNews> COrm::selectNewsAll()
+{
+    std::vector<CNews> Result;
+    sql::ResultSet* pResult = m_pCSqlConnector->executeResult("select \
+Roles.fk_Groups_id, \
+Roles.fk_Users_id, \
+News.id, \
+News.created, \
+News.subject, \
+News.text, \
+News.anonymously, \
+News.fk_Roles_id, \
+News.shared \
+from News \
+join Roles \
+on News.fk_Roles_id = Roles.id \
+where News.shared = 1 \
+order by News.created desc \
+;");
+    while (pResult->next())
+    {
+        int nGroupId = pResult->getInt("fk_Groups_id");
+        int nAuthorId = pResult->getInt("fk_Users_id");
+
+        SNews PreNews = SNews(pResult->getInt("id"),
+                              pResult->getInt("fk_Roles_id"),
+                              pResult->getString("created").c_str(),
+                              pResult->getString("subject").c_str(),
+                              pResult->getString("text").c_str(),
+                              pResult->getInt("anonymously"),
+                              pResult->getInt("shared"));
+        CNews News = CNews(PreNews);
+        if(!PreNews.m_bAnonymously)
+        {
+            News.addAuthor(findUserById(nAuthorId));
+        }
+        News.addGroup(findGroupById(nGroupId));
+        Result.push_back(News);
+
+    }
+    delete pResult;
+    return Result;
+}
+
 std::vector<SGroup> COrm::selectAllGroupsVisibleByUser(int nId)
 {
     qDebug() << __FUNCTION__;
     std::vector<SGroup> Result;
 
-    SPlayer Player = findPlayerById(nId);
+//    SPlayer Player = findPlayerById(nId);
 
     sql::PreparedStatement* pPreparedStatement;
-    if(Player.m_bAdmin)
-    {
-        pPreparedStatement = m_pCSqlConnector->prepare("\
-select Groups.id, \
-Groups.fk_Groups_id_parent, \
-Groups.name, \
-Groups.description, \
-Groups.type \
-from Groups");
-    }
-    else
-    {
+//    if(Player.m_bAdmin)
+//    {
+//        pPreparedStatement = m_pCSqlConnector->prepare("\
+//select Groups.id, \
+//Groups.fk_Groups_id_parent, \
+//Groups.name, \
+//Groups.description, \
+//Groups.type \
+//from Groups");
+//    }
+//    else
+//    {
         pPreparedStatement = m_pCSqlConnector->prepare("\
 select ChildGroups.id, \
 ChildGroups.fk_Groups_id_parent, \
@@ -483,7 +789,256 @@ or Groups.type = 'public';");
         unsigned short i = 1;
         pPreparedStatement->setInt(i++, nId);
         pPreparedStatement->setInt(i++, nId);
+//    }
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result.push_back(SGroup(pResult->getInt("id"),
+            pResult->getInt("fk_Groups_id_parent"),
+            pResult->getString("name").c_str(),
+            pResult->getString("description").c_str(),
+            pResult->getString("type").c_str()));
     }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+void COrm::stunUserId(int nStun, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `UserStats` \
+SET `stun`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nStun);
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+bool COrm::switchAirType(int nInitAirSeconds, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+
+    SUserStat Stat = findUserStatsById(nUserId);
+    int nNewAir = -1;
+    if(Stat.m_nAir == -1)
+    {
+        nNewAir = nInitAirSeconds;
+    }
+
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `UserStats` \
+SET `air`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nNewAir);
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+    return nNewAir > 0;
+}
+
+EUserStates COrm::modifyAirUserId(int nDelta, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+
+    SUserStat Stat = findUserStatsById(nUserId);
+    if(Stat.m_nHp == 0)
+    {
+        return AlreadyDead;
+    }
+    int nNewHp = Stat.m_nHp + nDelta;
+    if(nNewHp > Stat.m_nHpMax)
+    {
+        nNewHp = Stat.m_nHpMax;
+    }
+    else if(nNewHp < 0)
+    {
+        nNewHp = 0;
+    }
+
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `UserStats` \
+SET `hp`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nNewHp);
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+
+    if(nDelta > 0)
+    {
+        if(Stat.m_nHp == Stat.m_nHpMax)
+        {
+            return AlreadyFull;
+        }
+        else if(nNewHp == Stat.m_nHpMax)
+        {
+            return HealedToCap;
+        }
+        else
+        {
+            return Healed;
+        }
+    }
+    else
+    {
+        if(nNewHp == 0)
+        {
+            return Died;
+        }
+        else
+        {
+            return Damaged;
+        }
+    }
+}
+
+EUserStates COrm::modifyHealthUserId(int nDelta, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+
+    SUserStat Stat = findUserStatsById(nUserId);
+    if(Stat.m_nHp == 0)
+    {
+        return AlreadyDead;
+    }
+    int nNewHp = Stat.m_nHp + nDelta;
+    if(nNewHp > Stat.m_nHpMax)
+    {
+        nNewHp = Stat.m_nHpMax;
+    }
+    else if(nNewHp < 0)
+    {
+        nNewHp = 0;
+    }
+
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `UserStats` \
+SET `hp`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nNewHp);
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+
+    if(nDelta > 0)
+    {
+        if(Stat.m_nHp == Stat.m_nHpMax)
+        {
+            return AlreadyFull;
+        }
+        else if(nNewHp == Stat.m_nHpMax)
+        {
+            return HealedToCap;
+        }
+        else
+        {
+            return Healed;
+        }
+    }
+    else
+    {
+        if(nNewHp == 0)
+        {
+            return Died;
+        }
+        else
+        {
+            return Damaged;
+        }
+    }
+}
+
+void COrm::modifyPsyUserId(int nDelta, int nUserId)
+{
+    qDebug() << __FUNCTION__;
+
+    SUserStat Stat = findUserStatsById(nUserId);
+    int nNewPp = Stat.m_nPp + nDelta;
+    if(nNewPp > 100)
+    {
+        nNewPp = 100;
+    }
+    else if(nNewPp < 0)
+    {
+        nNewPp = 0;
+    }
+
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("UPDATE `UserStats` \
+SET `pp`=? \
+WHERE id=?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nNewPp);
+    pPreparedStatement->setInt(i++, nUserId);
+    pPreparedStatement->executeUpdate();
+    delete pPreparedStatement;
+}
+
+std::vector<SUserStat> COrm::selectUserStatsAll()
+{
+    qDebug() << __FUNCTION__;
+
+    std::vector<SUserStat> Result;
+    sql::ResultSet* pResult = m_pCSqlConnector->executeResult("SELECT * FROM UserStats;");
+    while (pResult->next()) {
+        Result.push_back(SUserStat(pResult->getInt("id"),
+                                   pResult->getInt("hp_max"),
+                                   pResult->getInt("hp"),
+                                   pResult->getInt("pp"),
+                                   pResult->getInt("air"),
+                                   pResult->getInt("fk_Items_id_air"),
+                                   pResult->getInt("stun")));
+    }
+    delete pResult;
+    return Result;
+}
+
+std::string COrm::createUniqueHash()
+{
+    qDebug() << __FUNCTION__;
+    std::string sNewHash;
+    bool bFound = false;
+    int nHashsGenerated = 0;
+    do
+    {
+        QString sTime = QString::number(QDateTime::currentMSecsSinceEpoch() + nHashsGenerated++);
+        QString sHash = QCryptographicHash::hash(sTime.toUtf8(), QCryptographicHash::Md5).toHex();
+        sNewHash = sHash.left(HASH_LEN).toStdString();
+
+        SUser User = findUserByHashString(sNewHash);
+        if(User.m_nId > 0)
+        {
+            qDebug() << "user with such hash found";
+            bFound = true;
+            continue;
+        }
+        SItem Item = findItemByHashString(sNewHash);
+        if(Item.m_nId > 0)
+        {
+            qDebug() << "item with such hash found";
+            bFound = true;
+            continue;
+        }
+    }
+    while(bFound == true);
+    qDebug() << "new unique hash" << sNewHash.c_str();
+    return sNewHash;
+}
+
+std::vector<SGroup> COrm::selectAllGroupsVisibleByAdmin()
+{
+    qDebug() << __FUNCTION__;
+    std::vector<SGroup> Result;
+
+    sql::PreparedStatement* pPreparedStatement;
+    pPreparedStatement = m_pCSqlConnector->prepare("\
+select Groups.id, \
+Groups.fk_Groups_id_parent, \
+Groups.name, \
+Groups.description, \
+Groups.type \
+from Groups");
     sql::ResultSet* pResult = pPreparedStatement->executeQuery();
     while (pResult->next()) {
         Result.push_back(SGroup(pResult->getInt("id"),
@@ -499,6 +1054,7 @@ or Groups.type = 'public';");
 
 std::vector<CNews> COrm::selectNewsAllVisibleByUser(int nWatcherId)
 {
+    /// TODO use selectNewsAll and then filter them
     std::vector<SGroup> aGroupsVisibleByWatcher = selectAllGroupsVisibleByUser(nWatcherId);
     std::vector<CNews> Result;
     sql::ResultSet* pResult = m_pCSqlConnector->executeResult("select \
@@ -546,6 +1102,11 @@ order by News.created desc \
     }
     delete pResult;
     return Result;
+}
+
+std::vector<CNews> COrm::selectNewsAllVisibleByAdmin()
+{
+    return selectNewsAll();
 }
 
 /*std::vector<CGroup> COrm::selectAllGroupsInfoVisibleByUser(int nId)
@@ -625,7 +1186,9 @@ select Users.id, \
 Users.name, \
 Users.surname, \
 Users.patronymic, \
+Users.male, \
 Users.birth_date, \
+Users.specialty, \
 Users.profession, \
 Users.description \
 from Users \
@@ -635,12 +1198,39 @@ where Users.id = ?;");
     sql::ResultSet* pResult = pPreparedStatement->executeQuery();
     while (pResult->next()) {
         Result = SUser(pResult->getInt("id"),
-            pResult->getString("name").c_str(),
-            pResult->getString("surname").c_str(),
-            pResult->getString("patronymic").c_str(),
-            pResult->getString("birth_date").c_str(),
-            pResult->getString("profession").c_str(),
-            pResult->getString("description").c_str());
+                       pResult->getString("name").c_str(),
+                       pResult->getString("surname").c_str(),
+                       pResult->getString("patronymic").c_str(),
+                       (bool)pResult->getInt("male"),
+                       pResult->getString("birth_date").c_str(),
+                       pResult->getString("specialty").c_str(),
+                       pResult->getString("profession").c_str(),
+                       pResult->getString("description").c_str());
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+SUserStat COrm::findUserStatsById(int nId)
+{
+    qDebug() << __FUNCTION__;
+    SUserStat Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select * \
+from UserStats \
+where UserStats.id = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result = SUserStat(pResult->getInt("id"),
+                       pResult->getInt("hp_max"),
+                       pResult->getInt("hp"),
+                       pResult->getInt("pp"),
+                       pResult->getInt("air"),
+                       pResult->getInt("fk_Items_id_air"),
+                       pResult->getInt("stun"));
     }
     delete pResult;
     delete pPreparedStatement;
@@ -707,6 +1297,35 @@ from Players \
 where Players.id = ?;");
     unsigned short i = 1;
     pPreparedStatement->setInt(i++, nId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result = SPlayer(
+                    pResult->getInt("id"),
+                    pResult->getInt("fk_Users_id"),
+                    pResult->getString("name").c_str(),
+                    pResult->getString("surname").c_str(),
+                    pResult->getString("patronymic").c_str(),
+                    pResult->getString("nick").c_str(),
+                    pResult->getString("birth_date").c_str(),
+                    pResult->getString("quenta").c_str(),
+                    (bool)pResult->getInt("admin")
+        );
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
+SPlayer COrm::findPlayerByUserId(int nUserId)
+{
+    qDebug() << __FUNCTION__;
+    SPlayer Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select * \
+from Players \
+where Players.fk_Users_id = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nUserId);
     sql::ResultSet* pResult = pPreparedStatement->executeQuery();
     while (pResult->next()) {
         Result = SPlayer(
@@ -803,6 +1422,27 @@ where fk_Groups_id = ?;");
     return Result;
 }
 
+SItem COrm::findItemById(int nId)
+{
+    qDebug() << __FUNCTION__;
+    SItem Result;
+    sql::PreparedStatement* pPreparedStatement = m_pCSqlConnector->prepare("\
+select * \
+from Items \
+where Items.id = ?;");
+    unsigned short i = 1;
+    pPreparedStatement->setInt(i++, nId);
+    sql::ResultSet* pResult = pPreparedStatement->executeQuery();
+    while (pResult->next()) {
+        Result = SItem(pResult->getInt("id"),
+            pResult->getString("json_data").c_str(),
+            pResult->getString("hash").c_str());
+    }
+    delete pResult;
+    delete pPreparedStatement;
+    return Result;
+}
+
 SPlayer COrm::selectPlayerBy(std::string sName, std::string sSurname, std::string sPatronymic, std::string sNick, std::string sBirthDate, std::string sQuenta)
 {
     SPlayer Result;
@@ -840,6 +1480,8 @@ void COrm::dropTables()
     m_pCSqlConnector->execute(GROUP_DROP_SCRIPT);
     m_pCSqlConnector->execute(ROLE_DROP_SCRIPT);
     m_pCSqlConnector->execute(NEWS_DROP_SCRIPT);
+    m_pCSqlConnector->execute(USER_STAT_DROP_SCRIPT);
+    m_pCSqlConnector->execute(ITEM_DROP_SCRIPT);
 }
 
 void COrm::createTables()
@@ -853,6 +1495,8 @@ void COrm::createTables()
     m_pCSqlConnector->execute(GROUP_CREATE_SCRIPT);
     m_pCSqlConnector->execute(ROLE_CREATE_SCRIPT);
     m_pCSqlConnector->execute(NEWS_CREATE_SCRIPT);
+    m_pCSqlConnector->execute(USER_STAT_CREATE_SCRIPT);
+    m_pCSqlConnector->execute(ITEM_CREATE_SCRIPT);
 
     m_pCSqlConnector->execute(PLAYER_CONNECT_SCRIPT);
     m_pCSqlConnector->execute(CREDENTIAL_CONNECT_SCRIPT);
@@ -862,6 +1506,8 @@ void COrm::createTables()
     m_pCSqlConnector->execute(ROLE_CONNECT_SCRIPT_1);
     m_pCSqlConnector->execute(ROLE_CONNECT_SCRIPT_2);
     m_pCSqlConnector->execute(NEWS_CONNECT_SCRIPT);
+    m_pCSqlConnector->execute(USER_STAT_CONNECT_SCRIPT_1);
+    m_pCSqlConnector->execute(USER_STAT_CONNECT_SCRIPT_2);
 
     m_pCSqlConnector->execute(USER_UTF8_SCRIPT);
     m_pCSqlConnector->execute(PLAYER_UTF8_SCRIPT);
@@ -870,6 +1516,20 @@ void COrm::createTables()
     m_pCSqlConnector->execute(GROUP_UTF8_SCRIPT);
     m_pCSqlConnector->execute(ROLE_UTF8_SCRIPT);
     m_pCSqlConnector->execute(NEWS_UTF8_SCRIPT);
+    m_pCSqlConnector->execute(USER_STAT_UTF8_SCRIPT);
+    m_pCSqlConnector->execute(ITEM_UTF8_SCRIPT);
     /// keys
     enableForingKeys();
+}
+
+CUser COrm::getUserById(int nId)
+{
+    CUser User = CUser(findUserById(nId));
+    std::vector<SRole> UserRoles = findRolesByUserId(nId);
+    for(size_t i = 0; i < UserRoles.size(); ++i)
+    {
+        int nCurRoleGroupId = UserRoles.at(i).m_nGroupId;
+        User.addGroup(findGroupById(nCurRoleGroupId));
+    }
+    return User;
 }

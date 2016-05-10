@@ -39,7 +39,16 @@ SOURCES += main.cpp \
     orm/aggregation_objects/cplayer.cpp \
     orm/sql_objects/scredential.cpp \
     orm/sql_objects/splayer.cpp \
-    cconnectionkeeper.cpp
+    cconnectionkeeper.cpp \
+    orm/sql_objects/suserstat.cpp \
+    orm/sql_objects/sitem.cpp \
+    items/shealshot.cpp \
+    items/iitem.cpp \
+    common/common.cpp \
+    items/citemmanager.cpp \
+    items/sairlock.cpp \
+    tick/ctickmanager.cpp \
+    items/saircell.cpp
 
 HEADERS += \
     server/echoserver.h \
@@ -65,7 +74,16 @@ HEADERS += \
     orm/sql_objects/snews.h \
     orm/aggregation_objects/cnews.h \
     orm/aggregation_objects/cplayer.h \
-    cconnectionkeeper.h
+    cconnectionkeeper.h \
+    orm/sql_objects/suserstat.h \
+    orm/sql_objects/sitem.h \
+    items/shealshot.h \
+    items/iitem.h \
+    common/common.h \
+    items/citemmanager.h \
+    items/sairlock.h \
+    tick/ctickmanager.h \
+    items/saircell.h
 
 unix:!macx: LIBS += -L$$PWD/../../sdk/mysql-connector/lib/ -lmysqlcppconn
 

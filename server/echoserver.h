@@ -44,6 +44,9 @@ public:
 public Q_SLOTS:
     void send();
     void play();
+    void sendStatusChange(QByteArray sStatusChange, int nPlayerId);
+    void sendStatusUpdate(int nPlayerId);
+    void sendQrClose(int nPlayerId);
 
 Q_SIGNALS:
     void closed();

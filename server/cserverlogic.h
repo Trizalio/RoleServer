@@ -4,38 +4,71 @@
 #include <iostream>
 #include <stdio.h>
 
-#include <orm/corm.h>
+#include "orm/corm.h"
+#include "common/common.h"
+#include "items/citemmanager.h"
 
-class CServerLogic
+class CServerLogic : public QObject
 {
+    Q_OBJECT
+
+signals:
+    void statusChange(QByteArray sStatusChange, int nPlayerId);
+    void qrClosed(int nPlayerId);
+
 public:
     CServerLogic(COrm *pOrm);
 
-    SPlayer login(std::string sLogin, std::string sPassword);
-    SPlayer getPlayerById(int nId);
-    QByteArray getPlayerData(int nId);
-    QByteArray getPlayersAll(); /// Admin
+    /// Depricated
+//    SPlayer login(std::string sLogin, std::string sPassword);
+    QPair<int, bool> login(std::string sLogin, std::string sPassword);
 
-    QByteArray getUserDataByWatcher(int nId, int nWatcherId);
-    QByteArray getUsersAllData();
+    /// Depricated
+//    SPlayer getPlayerById(int nId);
 
-    QByteArray getProjectDataByWatcher(int nId, int nWatcherId);
-    QByteArray getProjectsDataByWatcher(int nId);
-    QByteArray getProjectsAllData(); /// Unused
+    bool CheckAdminByPlayerId(int nId);
+    QPair<int, bool> getUserIdAndIsAdminByPlayerId(int nPlayerId);
+    int getPlayerIdByUserId(int nUserId);
 
-    QByteArray getNewsAllByWatcher(int nId);
+    QByteArray getPlayerData(int nPlayerId);                                    /// Self or Admin
+    QByteArray getPlayersAll();                                                 /// Admin
 
-    bool addPlayer(QByteArray jPlayer);
-    bool updatePlayer(QByteArray jPlayer);
-    bool updatePlayerCredential(QByteArray jCredential);
-    bool deletePlayer(int nPlayerId);
+    QByteArray getUserByIdVisibleByPlayerId(int nUserId, int nPlayerId);        /// Admin check inside
+    QByteArray getUsersAllData();                                               /// Public
 
-    bool addUser(QByteArray jUser);
-    bool updateUser(QByteArray jUser);
-    bool deleteUser(int nUserId);
+    QByteArray getUserStatusVisibleByPlayerId(int nPlayerId);
+
+    QByteArray getProjectByIdVisibleByPlayerId(int nProjectId, int nPlayerId);  /// Admin check inside
+    QByteArray getProjectsAllVisibleByPlayerId(int nPlayerId);                  /// Admin check inside
+//    QByteArray getProjectsAllData();                                            /// Unused
+
+    QByteArray getNewsAllVisibleByPlayerId(int nPlayerId);                      /// Admin check inside
+
+    bool addPlayer(QByteArray jPlayer);                                         /// Admin
+    bool updatePlayer(QByteArray jPlayer);                                      /// Admin
+    bool updatePlayerCredential(QByteArray jCredential);                        /// Admin
+    bool deletePlayer(int nPlayerId);                                           /// Admin
+
+    bool addUser(QByteArray jUser);                                             /// Admin
+    bool updateUser(QByteArray jUser);                                          /// Admin
+    bool deleteUser(int nUserId);                                               /// Admin
+
+    QByteArray genereateNewHashForUserByPlayerId(int nPlayerId);
+
+    QByteArray useItemByHashByPlayerId(std::string sHash, int nPlayerId);
+    QByteArray getActionsByHash(std::string sHash);
+    QByteArray actionByPlayerId(std::string sAction, int nPlayerId);
+
+    void healthLossByPlayerId(int nPlayerId);
+    void psyLossByPlayerId(int nPlayerId);
+
+    /// TODO ???
+//    QByteArray getActions(std::string sHash);
 
 private:
-    QByteArray getJsonFromUser(SUser& User);
+//    QByteArray getJsonFromUser(SUser& User);
+
+    int m_nHashsGenerated = 0;
 
     COrm* m_pOrm;
 };

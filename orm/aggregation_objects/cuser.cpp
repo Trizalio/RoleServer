@@ -1,5 +1,10 @@
 #include "cuser.h"
 
+CUser::CUser()
+{
+
+}
+
 CUser::CUser(SUser User):
     m_User(User)
 {
