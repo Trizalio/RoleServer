@@ -20,17 +20,17 @@ PRIMARY KEY (`id`) \
 struct SCredential
 {
 public:
-    static std::string getPassHash(std::string sPassword);
+    static QString getPassHash(QString sPassword);
     SCredential();
     SCredential(int nPlayerId,
-            std::string sLogin,
-            std::string sPasswordHash);
+            QString sLogin,
+            QString sPasswordHash);
 
     static SCredential getObjectFromJson(QByteArray jCredential);
 
     int m_nId = 0;
-    std::string m_sLogin;
-    std::string m_sPasswordHash;
+    QString m_sLogin;
+    QString m_sPasswordHash;
 };
 
 #endif // SCREDENTIAL

@@ -14,6 +14,7 @@ QT       -= gui
 
 TARGET = RoleServer
 CONFIG   += console
+CONFIG  += c++11
 CONFIG   -= app_bundle
 
 TEMPLATE = app
@@ -48,7 +49,8 @@ SOURCES += main.cpp \
     items/citemmanager.cpp \
     items/sairlock.cpp \
     tick/ctickmanager.cpp \
-    items/saircell.cpp
+    items/saircell.cpp \
+    orm/sql_objects/slore.cpp
 
 HEADERS += \
     server/echoserver.h \
@@ -83,7 +85,8 @@ HEADERS += \
     items/citemmanager.h \
     items/sairlock.h \
     tick/ctickmanager.h \
-    items/saircell.h
+    items/saircell.h \
+    orm/sql_objects/slore.h
 
 unix:!macx: LIBS += -L$$PWD/../../sdk/mysql-connector/lib/ -lmysqlcppconn
 

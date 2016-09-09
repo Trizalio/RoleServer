@@ -40,8 +40,8 @@ QJsonObject CUser::getJsonObject()
 //    {
 //        QJsonObject jCellObject;
 //        jCellObject.insert("Id", QJsonValue(m_aGroups.at(i).m_nId));
-//        jCellObject.insert("Name", QJsonValue(m_aGroups.at(i).m_sName.c_str()));
-//        jCellObject.insert("Description", QJsonValue(m_aGroups.at(i).m_sDescription.c_str()));
+//        jCellObject.insert("Name", QJsonValue(m_aGroups.at(i).m_sName));
+//        jCellObject.insert("Description", QJsonValue(m_aGroups.at(i).m_sDescription));
 
 //        QJsonValue jGroupValue(jCellObject);
 //        jGroupsArray.append(jGroupValue);
@@ -51,12 +51,12 @@ QJsonObject CUser::getJsonObject()
 //    jUser.insert("Groups", jGroupsValue);
 
 //    jUser.insert("Id", m_nId);
-//    jUser.insert("Name", m_sName.c_str());
-//    jUser.insert("Surname", m_sSurname.c_str());
-//    jUser.insert("Patronymic", m_sPatronymic.c_str());
-//    jUser.insert("BirthDate", m_sBirthDate.c_str());
-//    jUser.insert("Profession", m_sProfession.c_str());
-//    jUser.insert("Description", m_sDescription.c_str());
+//    jUser.insert("Name", m_sName);
+//    jUser.insert("Surname", m_sSurname);
+//    jUser.insert("Patronymic", m_sPatronymic);
+//    jUser.insert("BirthDate", m_sBirthDate);
+//    jUser.insert("Profession", m_sProfession);
+//    jUser.insert("Description", m_sDescription);
 
 
 //    QJsonDocument jDocument;

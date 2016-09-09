@@ -8,12 +8,12 @@ SAirCell::SAirCell(int nSize):
 
 QString SAirCell::getName()
 {
-    return "Блок регенерации кислорода";
+    return "Кислородная ячейка";
 }
 
 QString SAirCell::getType()
 {
-    return "Ресурс работы " + QString::number(m_nSize/60) + " минут";
+    return "Запас кислорода на 15 минут";
 }
 
 QStringList SAirCell::getActions()

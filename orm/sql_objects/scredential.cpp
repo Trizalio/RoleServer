@@ -2,19 +2,19 @@
 
 #define SALT "Trizalio"
 
-std::string SCredential::getPassHash(std::string sPassword)
+QString SCredential::getPassHash(QString sPassword)
 {
-    std::string sPassWithSalt(sPassword);
+    QString sPassWithSalt(sPassword);
     sPassWithSalt.append(SALT);
-    qDebug() << sPassWithSalt.c_str();
-    QString sHash = QCryptographicHash::hash(sPassWithSalt.c_str(), QCryptographicHash::Md5).toHex();
-    qDebug() << sHash.toStdString().c_str();
-    return sHash.toStdString();
+    qDebug() << sPassWithSalt;
+    QString sHash = QCryptographicHash::hash(sPassWithSalt.toLatin1(), QCryptographicHash::Md5).toHex();
+    qDebug() << sHash;
+    return sHash;
 }
 
 SCredential::SCredential(){}
 
-SCredential::SCredential(int nPlayerId, std::string sLogin, std::string sPasswordHash):
+SCredential::SCredential(int nPlayerId, QString sLogin, QString sPasswordHash):
     m_nId(nPlayerId),
     m_sLogin(sLogin),
     m_sPasswordHash(sPasswordHash)
@@ -50,7 +50,7 @@ SCredential SCredential::getObjectFromJson(QByteArray jCredential)
         return SCredential();
     }
     int nPlayerId = jPlayerId.toInt();
-    std::string sLogin = jLogin.toString().toStdString();
-    std::string sPassword = jPassword.toString().toStdString();
+    QString sLogin = jLogin.toString();
+    QString sPassword = jPassword.toString();
     return SCredential(nPlayerId, sLogin, sPassword);
 }

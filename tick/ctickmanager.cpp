@@ -48,14 +48,30 @@ void CTickManager::cureStun(std::vector<SUserStat>& aUserStats)
         {
             it->m_bChanged = true;
             it->m_nAir -= 1;
-            if(it->m_nAir <= 0)
+            if(it->m_nAir == 4 * 60)
+            {
+//                it->m_nHp = 0;
+//                m_pOrm->modifyHealthUserId(-100, it->m_nId);
+                SPlayer Player = m_pOrm->findPlayerByUserId(it->m_nId);
+                emit statusChange("Из-за кислородного голодания Вы испытываете головокружение, слабость, тошноту!",
+                                  Player.m_nId);
+            }
+            else if(it->m_nAir == 2 * 60)
+            {
+                SPlayer Player = m_pOrm->findPlayerByUserId(it->m_nId);
+                it->m_nHp = 1;
+//                m_pOrm->modifyHealthUserId(-100, it->m_nId);
+                emit statusChange("Из-за кислородного голодания Вы получили повреждение лёгких и не способны самостоятельно передвигаться!",
+                                  Player.m_nId);
+            }
+            else if(it->m_nAir == 0)
             {
                 SPlayer Player = m_pOrm->findPlayerByUserId(it->m_nId);
                 it->m_nHp = 0;
 //                m_pOrm->modifyHealthUserId(-100, it->m_nId);
                 emit statusChange("Вы задохнулись!", Player.m_nId);
             }
-            if(it->m_nAirId > 0)
+            /*if(it->m_nAirId > 0)
             {
                 SItem Item = m_pOrm->findItemById(it->m_nAirId);
                 if(Item.m_nId > 0)
@@ -79,7 +95,7 @@ void CTickManager::cureStun(std::vector<SUserStat>& aUserStats)
                         }
                     }
                 }
-            }
+            }*/
         }
 
     }

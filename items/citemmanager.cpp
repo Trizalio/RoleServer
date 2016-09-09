@@ -10,7 +10,7 @@ IItem* CItemManager::parseItem(SItem Item)
     qDebug() << __FUNCTION__;
 
     QJsonParseError jError;
-    QJsonDocument jDocument = QJsonDocument::fromJson(Item.m_sJsonData.c_str(), &jError);
+    QJsonDocument jDocument = QJsonDocument::fromJson(Item.m_sJsonData.toLatin1(), &jError);
     if(jError.error != QJsonParseError::NoError
             || !jDocument.isObject())
     {
@@ -29,7 +29,7 @@ IItem* CItemManager::parseItem(SItem Item)
         qDebug() << "wrong type";
         return 0;
     }
-    std::string sType = jType.toString().toStdString();
+    QString sType = jType.toString();
 
     if(sType == TYPE_HEALSHOT)
     {

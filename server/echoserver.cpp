@@ -145,8 +145,8 @@ void EchoServer::processTextMessage(QString message)
             {
                 QString sLogin = message.section(" ", 2, 2);
                 QString sPasswordHash = message.section(" ", 3, 3);
-                QPair<int, bool> IdAndIsAdmin = m_ServerLogic.login(sLogin.toStdString(), sPasswordHash.toStdString());
-//                SPlayer Player = m_ServerLogic.login(sLogin.toStdString(), sPasswordHash.toStdString());
+                QPair<int, bool> IdAndIsAdmin = m_ServerLogic.login(sLogin, sPasswordHash);
+//                SPlayer Player = m_ServerLogic.login(sLogin, sPasswordHash);
 
                 int nNewId = IdAndIsAdmin.first;
                 bool bAdmin = IdAndIsAdmin.second;
@@ -359,7 +359,7 @@ void EchoServer::processTextMessage(QString message)
             {
                 qDebug() << "qr action";
                 QString sAction = message.section(" ", 2);
-                m_ServerLogic.actionByPlayerId(sAction.toStdString(), nId);
+                m_ServerLogic.actionByPlayerId(sAction, nId);
 
 //                if(Connection.m_nConnectedId)
 //                {
@@ -422,7 +422,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to player data";
                 }
             }
-            if(sValue == "players")
+            else if(sValue == "players")
             {
                 if(Connection.m_bAdmin)
                 {
@@ -437,7 +437,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to players data";
                 }
             }
-            if(sValue == "user")
+            else if(sValue == "user")
             {
 ///                allowed while testing
 ///                if(nId > 0)
@@ -459,7 +459,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to user data";
                 }
             }
-            if(sValue == "users")
+            else if(sValue == "users")
             {
 ///                allowed while testing
 ///                if(nId > 0)
@@ -476,7 +476,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to people";
                 }
             }
-            if(sValue == "people")
+            else if(sValue == "people")
             {
 ///                allowed while testing
 ///                if(nId > 0)
@@ -493,7 +493,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to people";
                 }
             }
-            if(sValue == "project")
+            else if(sValue == "project")
             {
 ///                allowed while testing
 ///                if(nId > 0)
@@ -512,7 +512,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to user data";
                 }
             }
-            if(sValue == "projects")
+            else if(sValue == "projects")
             {
 ///                allowed while testing
 ///                if(nId > 0)
@@ -533,7 +533,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to projects";
                 }
             }
-            if(sValue == "news")
+            else if(sValue == "news")
             {
 ///                allowed while testing
 ///                if(nId > 0)
@@ -552,7 +552,7 @@ void EchoServer::processTextMessage(QString message)
                     qDebug() << "unauthorized access to projects";
                 }
             }
-            if(sValue == "status")
+            else if(sValue == "status")
             {
                 QByteArray aJson = m_ServerLogic.getUserStatusVisibleByPlayerId(nId);
                 QByteArray aAnswer = "status data:";
@@ -560,7 +560,7 @@ void EchoServer::processTextMessage(QString message)
                 pClient->sendTextMessage(aAnswer);
                 qDebug() << "sent status" << aAnswer;
             }
-            if(sValue == "qr")
+            else if(sValue == "qr")
             {
                 QString sData = message.section(" ", 2).toUtf8();
                 if(sData.isEmpty())
@@ -573,7 +573,7 @@ void EchoServer::processTextMessage(QString message)
                         pClient->sendTextMessage(aAnswer);
 //                        QString sTime = QString::number(QDateTime::currentMSecsSinceEpoch() + m_HashGenerated++);
 //                        QString sHash = QCryptographicHash::hash(sTime.toUtf8(), QCryptographicHash::Md5).toHex();
-//                        m_HashToPlayerId[sHash.toStdString()] = nId;
+//                        m_HashToPlayerId[sHash] = nId;
 //                        pClient->sendTextMessage("qr data:{\"value\": \"" + sHash + "\"}");
                         qDebug() << "sent qr hash" << aJson;
                     }
@@ -587,20 +587,20 @@ void EchoServer::processTextMessage(QString message)
                 {
                     qDebug() << "qr red" << sData;
 
-                    QByteArray aJson = m_ServerLogic.useItemByHashByPlayerId(sData.toStdString(), nId);
+                    QByteArray aJson = m_ServerLogic.useItemByHashByPlayerId(sData, nId);
                     if(aJson.isEmpty() == false)
                     {
                         QByteArray aAnswer = "qr recognised:";
                         aAnswer.append(aJson);
                         pClient->sendTextMessage(aAnswer);
                         qDebug() << "qr recognised" << aJson;
-//                        int QrId = m_HashToPlayerId[sData.toStdString()];
+//                        int QrId = m_HashToPlayerId[sData];
 //                        m_ConnectionToPlayerConnection[pClient].m_nConnectedId = QrId;
 //                        SPlayer targetPlayer = m_ServerLogic.getPlayerById(QrId);
 //                        pClient->sendTextMessage(QString(("qr recognised:{\"object\": \"" + targetPlayer.m_sSurname
 //                                             + " "  + targetPlayer.m_sName
 //                                             + " "  + targetPlayer.m_sPatronymic
-//                                            + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}").c_str()));
+//                                            + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}")));
                     }
                     else
                     {
@@ -609,6 +609,14 @@ void EchoServer::processTextMessage(QString message)
                     }
 
                 }
+            }
+            else if(sValue == "lore")
+            {
+                QByteArray aJson = m_ServerLogic.getLore();
+                QByteArray aAnswer = "lore data:";
+                aAnswer.append(aJson);
+                pClient->sendTextMessage(aAnswer);
+                qDebug() << "sent lore";// << aAnswer;
             }
         }
         /*if(message == "test")
@@ -631,8 +639,8 @@ void EchoServer::processTextMessage(QString message)
 
             QFile File("/home/trizalio/QT/build-RoleServer-Desktop_Qt_Qt_Version_GCC_64bit-Debug/ws.json");
             if(File.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-            File.write(message.toStdString().c_str(), message.length());
-            qDebug() << m_sValue << "res:" << message.toStdString().find(m_sValue.toStdString().c_str());
+            File.write(message, message.length());
+            qDebug() << m_sValue << "res:" << message.find(m_sValue);
 
             pClient->sendTextMessage("got test result");
 
@@ -650,7 +658,7 @@ void EchoServer::processTextMessage(QString message)
         {
             m_sValue = message;
             size_t i = 0;
-            while((i = m_sValue.toStdString().find(",")) < m_sValue.length())
+            while((i = m_sValue.find(",")) < m_sValue.length())
             {
                 m_sValue.remove(i, 1);
             }

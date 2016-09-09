@@ -10,8 +10,8 @@ struct SDialogue
 public:
     SDialogue(){}
 //    SDialogue(int nId,
-//            std::string sLogin,
-//            std::string sPasswordHash):
+//            QString sLogin,
+//            QString sPasswordHash):
 //        m_nId(nId),
 //        m_sLogin(sLogin),
 //        m_sPasswordHash(sPasswordHash)

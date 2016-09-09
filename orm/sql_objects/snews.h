@@ -26,16 +26,16 @@ public:
 
     SNews(int nId,
             int nRoleId,
-            std::string sCreatedDatetime,
-            std::string sSubject,
-            std::string sText,
+            QString sCreatedDatetime,
+            QString sSubject,
+            QString sText,
             bool bAnonymously,
             bool bShared);
 
     SNews(int nRoleId,
-            std::string sCreatedDatetime,
-            std::string sSubject,
-            std::string sText,
+            QString sCreatedDatetime,
+            QString sSubject,
+            QString sText,
             bool bAnonymously,
             bool bShared);
 
@@ -44,9 +44,9 @@ public:
 
     int m_nId = 0;
     int m_nRoleId = 0;
-    std::string m_sCreatedDatetime;
-    std::string m_sSubject;
-    std::string m_sText;
+    QString m_sCreatedDatetime;
+    QString m_sSubject;
+    QString m_sText;
     bool m_bAnonymously = false;
     bool m_bShared = false;
 

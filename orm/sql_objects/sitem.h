@@ -19,16 +19,16 @@ class SItem : public CJsonSerializable
 {
 public:
     SItem();
-    SItem(std::string sJsonData);
+    SItem(QString sJsonData);
     SItem(int m_nId,
-          std::string sJsonData,
-          std::string sHash);
+          QString sJsonData,
+          QString sHash);
 
     QJsonObject getJsonObject() override;
 
     int m_nId = 0;
-    std::string m_sJsonData;
-    std::string m_sHash;
+    QString m_sJsonData;
+    QString m_sHash;
 };
 
 #endif // SITEM_H

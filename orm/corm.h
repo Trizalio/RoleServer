@@ -7,6 +7,7 @@
 #include "orm/csqlconnector.h"
 //#include "orm/sql_objects/shash.h"
 #include "orm/sql_objects/sitem.h"
+#include "orm/sql_objects/slore.h"
 #include "orm/sql_objects/suserstat.h"
 #include "orm/sql_objects/suser.h"
 #include "orm/sql_objects/splayer.h"
@@ -25,7 +26,7 @@
 
 #define HASH_LEN 4
 
-#define DATABASE_UTF8_SCRIPT std::string("ALTER DATABASE ") + DATABASE_NAME + std::string(" CHARACTER SET utf8 COLLATE utf8_general_ci")
+#define DATABASE_UTF8_SCRIPT QString("ALTER DATABASE ") + DATABASE_NAME + QString(" CHARACTER SET utf8 COLLATE utf8_general_ci")
 
 class COrm
 {
@@ -33,14 +34,15 @@ public:
     COrm(CSqlConnector* pSqlConnector);
 
 //    void insertHash(SHash& Hash);
-    void insertUser(SUser& User, SUserStat& UserStat);
-    void insertPlayer(SPlayer& Player);
-    void insertCredential(SCredential& Credential);
+    void insertUser(SUser User, SUserStat& UserStat);
+    void insertPlayer(SPlayer Player);
+    void insertCredential(SCredential Credential);
     void insertMessage(SMessage& Message);
     void insertGroup(SGroup& Group);
-    void insertRole(SRole& Role);
+    void insertRole(SRole Role);
     void insertNews(SNews& News);
-    void insertItem(SItem Item);
+    QString insertItem(SItem Item);
+    void insertLore(SLore Lore);
 
     void updateUser(SUser& User);
     void updateUserStat(SUserStat& UserStat);
@@ -68,7 +70,9 @@ public:
     std::vector<SRole> findRolesByUserId(int nUserId);
     std::vector<SRole> findRolesByGroupId(int nGroupId);
     SItem findItemById(int nId);
-    SPlayer findPlayerByLoginAndPassHash(std::string sLogin, std::string sPasswordHash);
+    SPlayer findPlayerByLoginAndPassHash(QString sLogin, QString sPasswordHash);
+
+    std::vector<SLore> getAllLores();
 
     ///////////////////////////
     /// Aggregation objects ///
@@ -84,6 +88,7 @@ public:
 
     std::vector<CNews> selectNewsAllVisibleByAdmin();
     std::vector<CNews> selectNewsAllVisibleByUser(int nWatcherId);
+    std::vector<CNews> selectNewsByGroup(int nGroupId);
 
     /////////////
     /// Other ///
@@ -109,16 +114,16 @@ public:
     /// Hash ///
     ////////////
 
-//    SHash findHashByHashString(std::string sHash);
-    SUser findUserByHashString(std::string sHash);
-    SItem findItemByHashString(std::string sHash);
+//    SHash findHashByHashString(QString sHash);
+    SUser findUserByHashString(QString sHash);
+    SItem findItemByHashString(QString sHash);
 //    SUser findUserByHash(SHash Hash);
-    std::string createUniqueHash();
+    QString createUniqueHash();
 
-    void setHashStringToUser(std::string sHash, int nUserId);
-    void setActionHashStringToUser(std::string sHash, int nUserId);
+    void setHashStringToUser(QString sHash, int nUserId);
+    void setActionHashStringToUser(QString sHash, int nUserId);
 
-    std::string getActionHashStringFromUser(int nUserId);
+    QString getActionHashStringFromUser(int nUserId);
 
     ////////////
     /// Junk ///
@@ -128,8 +133,8 @@ public:
     std::vector<SGroup> selectGroupsAll();
     std::vector<SUser> selectUserAll(); /// Used
     std::vector<SPlayer> selectPlayersAll(); /// Used
-    SPlayer selectPlayerBy(std::string sName, std::string sSurname, std::string sPatronymic,
-                           std::string sNick, std::string sBirthDate, std::string sQuenta);
+    SPlayer selectPlayerBy(QString sName, QString sSurname, QString sPatronymic,
+                           QString sNick, QString sBirthDate, QString sQuenta);
 
 
 private:

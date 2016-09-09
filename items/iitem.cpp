@@ -10,5 +10,5 @@ SItem IItem::toItem()
     jDocument.setObject(jObject);
     QString aJson = jDocument.toJson(QJsonDocument::Indented);
 
-    return SItem(aJson.toStdString());
+    return SItem(aJson);
 }

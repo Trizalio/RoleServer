@@ -6,7 +6,7 @@
 #define TYPE_AIRCELL "Aircell"
 #define USE_AIRCELL "Подключить к своему скафандру"
 
-#define DEFAULT_AIRCELL_SIZE_SEC 3600
+#define DEFAULT_AIRCELL_SIZE_SEC (15 * 60)
 
 class SAirCell : public IItem
 {

@@ -2,7 +2,7 @@
 
 SPlayer::SPlayer(){}
 
-SPlayer::SPlayer(std::string sName, std::string sSurname, std::string sPatronymic, std::string sNick, std::string sBirthDate, std::string sQuenta, bool bAdmin):
+SPlayer::SPlayer(QString sName, QString sSurname, QString sPatronymic, QString sNick, QString sBirthDate, QString sQuenta, bool bAdmin):
     m_sName(sName),
     m_sSurname(sSurname),
     m_sPatronymic(sPatronymic),
@@ -12,7 +12,7 @@ SPlayer::SPlayer(std::string sName, std::string sSurname, std::string sPatronymi
     m_bAdmin(bAdmin)
 {}
 
-SPlayer::SPlayer(int nUserId, std::string sName, std::string sSurname, std::string sPatronymic, std::string sNick, std::string sBirthDate, std::string sQuenta, bool bAdmin):
+SPlayer::SPlayer(int nUserId, QString sName, QString sSurname, QString sPatronymic, QString sNick, QString sBirthDate, QString sQuenta, bool bAdmin):
     m_nUserId(nUserId),
     m_sName(sName),
     m_sSurname(sSurname),
@@ -23,7 +23,7 @@ SPlayer::SPlayer(int nUserId, std::string sName, std::string sSurname, std::stri
     m_bAdmin(bAdmin)
 {}
 
-SPlayer::SPlayer(int nId, int nUserId, std::string sName, std::string sSurname, std::string sPatronymic, std::string sNick, std::string sBirthDate, std::string sQuenta, bool bAdmin):
+SPlayer::SPlayer(int nId, int nUserId, QString sName, QString sSurname, QString sPatronymic, QString sNick, QString sBirthDate, QString sQuenta, bool bAdmin):
     m_nId(nId),
     m_nUserId(nUserId),
     m_sName(sName),
@@ -91,12 +91,12 @@ SPlayer::SPlayer(int nId, int nUserId, std::string sName, std::string sSurname, 
 //        Result = SPlayer(
 //                    pResult->getInt("id"),
 //                    pResult->getInt("fk_Users_id"),
-//                    pResult->getString("name").c_str(),
-//                    pResult->getString("surname").c_str(),
-//                    pResult->getString("patronymic").c_str(),
-//                    pResult->getString("nick").c_str(),
-//                    pResult->getString("birth_date").c_str(),
-//                    pResult->getString("quenta").c_str(),
+//                    pResult->getString("name"),
+//                    pResult->getString("surname"),
+//                    pResult->getString("patronymic"),
+//                    pResult->getString("nick"),
+//                    pResult->getString("birth_date"),
+//                    pResult->getString("quenta"),
 //                    (bool)pResult->getInt("admin")
 //        );
 //    }
@@ -116,12 +116,12 @@ QJsonObject SPlayer::getJsonObject()
 
     jPlayer.insert("Id", m_nId);
     jPlayer.insert("UserId", m_nUserId);
-    jPlayer.insert("Name",m_sName.c_str());
-    jPlayer.insert("Surname",m_sSurname.c_str());
-    jPlayer.insert("Patronymic",m_sPatronymic.c_str());
-    jPlayer.insert("Nick",m_sNick.c_str());
-    jPlayer.insert("BirthDate",m_sBirthDate.c_str());
-    jPlayer.insert("Quenta",m_sQuenta.c_str());
+    jPlayer.insert("Name",m_sName);
+    jPlayer.insert("Surname",m_sSurname);
+    jPlayer.insert("Patronymic",m_sPatronymic);
+    jPlayer.insert("Nick",m_sNick);
+    jPlayer.insert("BirthDate",m_sBirthDate);
+    jPlayer.insert("Quenta",m_sQuenta);
     jPlayer.insert("Admin",m_bAdmin);
 
     return jPlayer;
@@ -168,12 +168,12 @@ SPlayer SPlayer::getObjectFromJson(QByteArray jPlayer)
         qDebug() << "wrong type";
         return SPlayer();
     }
-    std::string sName = jName.toString().toStdString();
-    std::string sSurname = jSurname.toString().toStdString();
-    std::string sPatronymic = jPatronymic.toString().toStdString();
-    std::string sNick = jNick.toString().toStdString();
-    std::string sBirthDate = jBirthDate.toString("2080-01-01").toStdString();
-    std::string sQuenta = jQuenta.toString().toStdString();
+    QString sName = jName.toString();
+    QString sSurname = jSurname.toString();
+    QString sPatronymic = jPatronymic.toString();
+    QString sNick = jNick.toString();
+    QString sBirthDate = jBirthDate.toString("2080-01-01");
+    QString sQuenta = jQuenta.toString();
     bool bAdmin = jAdmin.toBool();
     if(jNewPlayer.contains("Id")
             && jNewPlayer.contains("UserId"))

@@ -38,11 +38,11 @@ int main(int argc, char *argv[])
     parser.process(a);
     bool debug = true;//parser.isSet(dbgOption);
     int nWebSocketPort = parser.value(portOption).toInt();
-    std::string sMysqlPort = parser.value(mysqlPortOption).toStdString();
-    std::string sMysqlLogin = parser.value(mysqlLoginOption).toStdString();
-    std::string sMysqlPass = parser.value(mysqlPasswordOption).toStdString();
+    QString sMysqlPort = parser.value(mysqlPortOption);
+    QString sMysqlLogin = parser.value(mysqlLoginOption);
+    QString sMysqlPass = parser.value(mysqlPasswordOption);
 
-    qDebug() << sMysqlPass.c_str();
+    qDebug() << sMysqlPass;
     COrm* pOrm = new COrm(new CSqlConnector("tcp://127.0.0.1:" + sMysqlPort, sMysqlLogin, sMysqlPass));
 
     CConnectionKeeper* pConnectionKeeper = new CConnectionKeeper(pOrm);

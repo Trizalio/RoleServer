@@ -1,3 +1,6 @@
+
+#define _GLIBCXX_USE_CXX11_ABI 0
+
 #ifndef CSQLCONNECTOR_H
 #define CSQLCONNECTOR_H
 
@@ -18,13 +21,13 @@
 class CSqlConnector
 {
 public:
-    CSqlConnector(std::string sHost, std::string sLogin, std::string sPassword);
+    CSqlConnector(QString sHost, QString sLogin, QString sPassword);
     ~CSqlConnector();
     const CSqlConnector& operator=( const CSqlConnector& );
 
-    void execute(std::string sQuery);
-    sql::ResultSet* executeResult(std::string sQuery);
-    sql::PreparedStatement* prepare(std::string sQuery);
+    void execute(QString sQuery);
+    sql::ResultSet* executeResult(QString sQuery);
+    sql::PreparedStatement* prepare(QString sQuery);
 private:
 
 
@@ -34,9 +37,9 @@ private:
     sql::Driver* m_pDriver;
     sql::Connection *m_pConnection;
 
-    std::string m_sHost;
-    std::string m_sLogin;
-    std::string m_sPassword;
+    QString m_sHost;
+    QString m_sLogin;
+    QString m_sPassword;
 
 };
 

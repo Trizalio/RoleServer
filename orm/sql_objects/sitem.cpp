@@ -5,13 +5,13 @@ SItem::SItem()
 
 }
 
-SItem::SItem(std::string sJsonData):
+SItem::SItem(QString sJsonData):
     m_sJsonData(sJsonData)
 {
 
 }
 
-SItem::SItem(int m_nId, std::string sJsonData, std::string sHash):
+SItem::SItem(int m_nId, QString sJsonData, QString sHash):
     m_nId(m_nId),
     m_sJsonData(sJsonData),
     m_sHash(sHash)

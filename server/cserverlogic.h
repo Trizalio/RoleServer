@@ -20,8 +20,8 @@ public:
     CServerLogic(COrm *pOrm);
 
     /// Depricated
-//    SPlayer login(std::string sLogin, std::string sPassword);
-    QPair<int, bool> login(std::string sLogin, std::string sPassword);
+//    SPlayer login(QString sLogin, QString sPassword);
+    QPair<int, bool> login(QString sLogin, QString sPassword);
 
     /// Depricated
 //    SPlayer getPlayerById(int nId);
@@ -55,15 +55,17 @@ public:
 
     QByteArray genereateNewHashForUserByPlayerId(int nPlayerId);
 
-    QByteArray useItemByHashByPlayerId(std::string sHash, int nPlayerId);
-    QByteArray getActionsByHash(std::string sHash);
-    QByteArray actionByPlayerId(std::string sAction, int nPlayerId);
+    QByteArray useItemByHashByPlayerId(QString sHash, int nPlayerId);
+    QByteArray getActionsByHash(QString sHash);
+    QByteArray actionByPlayerId(QString sAction, int nPlayerId);
 
     void healthLossByPlayerId(int nPlayerId);
     void psyLossByPlayerId(int nPlayerId);
 
+    QByteArray getLore();
+
     /// TODO ???
-//    QByteArray getActions(std::string sHash);
+//    QByteArray getActions(QString sHash);
 
 private:
 //    QByteArray getJsonFromUser(SUser& User);

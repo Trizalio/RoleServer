@@ -4,18 +4,53 @@ CServerLogic::CServerLogic(COrm *pOrm):
     m_pOrm(pOrm)
 {
     SHealShot HealShot;
-    m_pOrm->insertItem(HealShot.toItem());
+    QString sHealHash = m_pOrm->insertItem(HealShot.toItem());
     SAirlock Airlock;
-    m_pOrm->insertItem(Airlock.toItem());
+    QString sAirlockHash = m_pOrm->insertItem(Airlock.toItem());
+    SAirCell AirCell;
+    QString sAirCellHash = m_pOrm->insertItem(AirCell.toItem());
+
+    m_pOrm->insertLore(SLore("Добро поаловать в 'Архив'!", "Здесь Вы можете ознакомиться с основными функциями различных разделов портала базы, "
+                                                   "после чего получить дальнейшие инструкции по проведению тестирования."));
+    m_pOrm->insertLore(SLore("Описание разделов", "Портал базы состоит из разделов. "
+                     "Лента содержит в себе новости из всех видимых Вам лабораторий и групп. "
+                     "'Статус' показывает наиболее важные аспекты Вашего текущего состояния. "
+                     "Разел 'Воздействия' используется для взаимодействия с приборами и полезными объектами, например, для ввода лечебной сыворотки. "
+                     "В разделе 'Проекты' отображены все видимые Вам проекты. "
+                     "Сходным образом в разделе 'Люди' показан полный список персонала базы. "
+                     "Открытый в данный момент раздел 'Архив' содержит полезную информацию общего характера. "
+                     "'Профиль' позволяет увидеть публичную информацию о Вас, а так же ознакомиться с более подробной личной информацией"
+                     "Ну и, наконец, 'Выход' позволяет Вам выйти с портала базы. "
+                     "Пожалуйста, пробегитесь по разделам, убедитесь, что они открываются, что содержимое соответствует названию, "
+                     "если всё в порядке, переходите к тестированию, удачи!"));
+    m_pOrm->insertLore(SLore("Задание для тестирования", "Одна из основных задач портала - слежение за Вашим состоянием, поэтому следующим заданием будет "
+                                    "перейти в раздел 'Статус' и отметить получение повреждения, нажав на кнопку '-'рядом с показателем Вашего здоровья "
+                     "при этом Ваше состояние должно измениться, проконтролируйте это, пожалуйста. "
+                     "Отметив повреждения, Вы получете возможность протестировать работу лечебной сыворотки. "
+                     "Для этого в нормальной ситуации Вам нужен был бы код с капсулы с сывороткой, но в рамках тестирования просто примените этот код:"
+                     + sHealHash +". "
+                     "Для чего перейдите в раздел 'Воздействия', введите этот код в поле 'Код' и нажмите 'Считать код'. "
+                     "После этих действий должна появиться панель взаимодействия с сывороткой, в которой будет одной действие - 'Принять', "
+                     "нажмите на кнопку и убедитесь в изменении Вашего статуса. "
+                     "Следующим заданием будет выход со станции через центральный шлюз, ситуация с кодом шлюза аналогична - "
+                     "в норме вы должны считывать код шлюза непосредственно с него, в режиме тестирования Вам достаточно ввести этот код:"+sAirlockHash+
+                     " и откроется панель шлюза, пройдите через него, вы начнёте задыхаться, что будет отображено в разделе 'статус', не бойтесь, "
+                     "атмосфера планеты не настолько смертельна, у Вас в запасе есть пара минут, надеюсь, Вам этого хватит, чтобы ввести код кислородной "
+                     "ячейки:"+sAirCellHash+" После активации кислородной ячейки проверьте свой статус и вернитесь на базу."
+                     "Минимальный цикл тестов на этом заканчивается, пожалуйста, напишите отчёт, обязательно сообщите, "
+                     "удалось ли Вам выполнить вышеописанные шаги, если где-то возникли трудности, не забудьте о них рассказать, спасибо!"));
+
+//    m_pOrm->insertLore(SLore("Дополнительное задание для тестирования", "Для выполнения этого задания Вам потребуется напраник, так же имеющий доступ к системе базы. "
+//                     "Ваш напарник должен войти в раздел 'Воздействия '"));
 }
 
-//SPlayer CServerLogic::login(std::string sLogin, std::string sPassword)
+//SPlayer CServerLogic::login(QString sLogin, QString sPassword)
 //{
 //    qDebug() << __FUNCTION__;
 //    SPlayer Player = m_pOrm->findPlayerByLoginAndPassHash(sLogin, sPassword);
 //    return Player;
 //}
-QPair<int, bool> CServerLogic::login(std::string sLogin, std::string sPassword)
+QPair<int, bool> CServerLogic::login(QString sLogin, QString sPassword)
 {
     qDebug() << __FUNCTION__;
     SPlayer Player = m_pOrm->findPlayerByLoginAndPassHash(sLogin, sPassword);
@@ -130,7 +165,7 @@ QByteArray CServerLogic::getUserStatusVisibleByPlayerId(int nPlayerId)
 
 QByteArray CServerLogic::getProjectByIdVisibleByPlayerId(int nProjectId, int nPlayerId)
 {
-    qDebug() << __FUNCTION__;
+    qDebug() << __FUNCTION__ << nProjectId << nPlayerId;
 
     QPair<int, bool> UserIdAndIsAdmin = getUserIdAndIsAdminByPlayerId(nPlayerId);
     int nWatcherUserId = UserIdAndIsAdmin.first;
@@ -145,6 +180,12 @@ QByteArray CServerLogic::getProjectByIdVisibleByPlayerId(int nProjectId, int nPl
     {
         Group = m_pOrm->getGroupInfoByIdVisibleByUser(nProjectId, nWatcherUserId);
     }
+
+    if(Group.notEmpty() == true)
+    {
+        Group.setNews(m_pOrm->selectNewsByGroup(nProjectId));
+    }
+
     return Group.getJson();
 }
 
@@ -238,7 +279,7 @@ bool CServerLogic::addPlayer(QByteArray jPlayer)
 {
     qDebug() << __FUNCTION__;
     SPlayer Player = SPlayer::getObjectFromJson(jPlayer);
-    if(Player.m_sName.empty())
+    if(Player.m_sName.isEmpty())
     {
         return false;
     }
@@ -280,7 +321,7 @@ bool CServerLogic::addUser(QByteArray jUser)
 {
     qDebug() << __FUNCTION__;
     SUser User = SUser::getObjectFromJson(jUser);
-    if(User.m_sName.empty())
+    if(User.m_sName.isEmpty())
     {
         return false;
     }
@@ -315,14 +356,14 @@ QByteArray CServerLogic::genereateNewHashForUserByPlayerId(int nPlayerId)
     QPair<int, bool> UserIdAndIsAdmin = getUserIdAndIsAdminByPlayerId(nPlayerId);
     int nWatcherUserId = UserIdAndIsAdmin.first;
 
-    std::string sNewHash = m_pOrm->createUniqueHash();
+    QString sNewHash = m_pOrm->createUniqueHash();
 
     m_pOrm->setHashStringToUser(sNewHash, nWatcherUserId);
 
-    return QByteArray(("{\"value\": \"" + sNewHash + "\"}").c_str());
+    return QByteArray(("{\"value\": \"" + sNewHash.toLatin1() + "\"}"));
 }
 
-QByteArray CServerLogic::useItemByHashByPlayerId(std::string sHash, int nPlayerId)
+QByteArray CServerLogic::useItemByHashByPlayerId(QString sHash, int nPlayerId)
 {
     /// TODO add some skills checks here
 
@@ -340,7 +381,7 @@ QByteArray CServerLogic::useItemByHashByPlayerId(std::string sHash, int nPlayerI
     return Result;
 }
 
-QByteArray CServerLogic::getActionsByHash(std::string sHash)
+QByteArray CServerLogic::getActionsByHash(QString sHash)
 {
     qDebug() << __FUNCTION__;
 
@@ -348,10 +389,10 @@ QByteArray CServerLogic::getActionsByHash(std::string sHash)
     if(User.m_nId > 0)
     {
         qDebug() << "user found";
-        return QByteArray(("{\"object\": \"" + User.m_sSurname
-                           + " "  + User.m_sName
-                           + " "  + User.m_sPatronymic
-                          + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}").c_str());
+        return QByteArray(("{\"object\": \"" + User.m_sSurname.toLatin1()
+                           + " "  + User.m_sName.toLatin1()
+                           + " "  + User.m_sPatronymic.toLatin1()
+                          + "\", \"data\": \"Человек\", \"actions\": [\"Взять анализ крови\", \"Оглушить\"]}"));
     }
 
     SItem Item = m_pOrm->findItemByHashString(sHash);
@@ -372,13 +413,13 @@ QByteArray CServerLogic::getActionsByHash(std::string sHash)
     return QByteArray();
 }
 
-QByteArray CServerLogic::actionByPlayerId(std::string sAction, int nPlayerId)
+QByteArray CServerLogic::actionByPlayerId(QString sAction, int nPlayerId)
 {
     qDebug() << __FUNCTION__;
     QPair<int, bool> UserIdAndIsAdmin = getUserIdAndIsAdminByPlayerId(nPlayerId);
     int nWatcherUserId = UserIdAndIsAdmin.first;
 
-    std::string sTargetHash = m_pOrm->getActionHashStringFromUser(nWatcherUserId);
+    QString sTargetHash = m_pOrm->getActionHashStringFromUser(nWatcherUserId);
 
     SUser TargetUser = m_pOrm->findUserByHashString(sTargetHash);
     if(TargetUser.m_nId > 0)
@@ -394,6 +435,16 @@ QByteArray CServerLogic::actionByPlayerId(std::string sAction, int nPlayerId)
             }
             return QByteArray("qr action accepted:");
         }
+        else if(sAction == "Взять анализ крови")
+        {
+            int nTargetPlayerId = getPlayerIdByUserId(TargetUser.m_nId);
+            if(nTargetPlayerId > 0)
+            {
+                emit statusChange("У Вас взяли анализ крови", nTargetPlayerId);
+                emit statusChange("Вы взяли анализ крови", nPlayerId);
+            }
+            return QByteArray("qr action accepted:");
+        }
     }
 
     SItem Item = m_pOrm->findItemByHashString(sTargetHash);
@@ -406,7 +457,7 @@ QByteArray CServerLogic::actionByPlayerId(std::string sAction, int nPlayerId)
             qDebug() << "got 0 pointer from parser";
             return QByteArray("internal error:");
         }
-        if(pItem->eType == HealShot)
+        else if(pItem->eType == HealShot)
         {
             int nTargetPlayerId = getPlayerIdByUserId(nWatcherUserId);
             if(sAction == USE_HEALSHOT)
@@ -432,7 +483,7 @@ QByteArray CServerLogic::actionByPlayerId(std::string sAction, int nPlayerId)
                 return QByteArray("qr action accepted:");
             }
         }
-        if(pItem->eType == Airlock)
+        else if(pItem->eType == Airlock)
         {
             int nTargetPlayerId = getPlayerIdByUserId(nWatcherUserId);
             if(sAction == USE_AIRLOCK)
@@ -444,6 +495,24 @@ QByteArray CServerLogic::actionByPlayerId(std::string sAction, int nPlayerId)
                 else
                 {
                     emit statusChange("Вы вошли на станцию", nTargetPlayerId);
+                }
+                emit qrClosed(nPlayerId);
+                return QByteArray("qr action accepted:");
+            }
+        }
+        else if(pItem->eType == AirCell)
+        {
+            int nTargetPlayerId = getPlayerIdByUserId(nWatcherUserId);
+            if(sAction == USE_AIRCELL)
+            {
+                EUserStates eState = m_pOrm->modifyAirUserId(DEFAULT_AIRCELL_SIZE_SEC, nWatcherUserId);
+                if(eState == AlreadyDead)
+                {
+                    emit statusChange("На Вас применена кислородная ячейка, однако, Вы уже мертвы", nTargetPlayerId);
+                }
+                else
+                {
+                    emit statusChange("Вы использовали кислородную ячейку", nTargetPlayerId);
                 }
                 emit qrClosed(nPlayerId);
                 return QByteArray("qr action accepted:");
@@ -484,16 +553,36 @@ void CServerLogic::psyLossByPlayerId(int nPlayerId)
     emit statusChange("Ваша психика стала менее устойчива", nPlayerId);
 }
 
+QByteArray CServerLogic::getLore()
+{
+    qDebug() << __FUNCTION__;
+
+    std::vector<SLore> aLores = m_pOrm->getAllLores();
+
+    QJsonArray jArray;
+    for(size_t i = 0; i < aLores.size(); ++i)
+    {
+        QJsonValue jValue(aLores[i].getJsonObject());
+        jArray.append(jValue);
+    }
+
+    QJsonDocument jDocument;
+    jDocument.setArray(jArray);
+    QByteArray aJson = jDocument.toJson(QJsonDocument::Indented);
+
+    return aJson;
+}
+
 //QByteArray CServerLogic::getJsonFromUser(SUser &User)
 //{
 //    QJsonObject jUser;
 //    jUser.insert("Id", User.m_nId);
-//    jUser.insert("Name", User.m_sName.c_str());
-//    jUser.insert("Surname", User.m_sSurname.c_str());
-//    jUser.insert("Patronymic", User.m_sPatronymic.c_str());
-//    jUser.insert("BirthDate", User.m_sBirthDate.c_str());
-//    jUser.insert("Profession", User.m_sProfession.c_str());
-//    jUser.insert("Description", User.m_sDescription.c_str());
+//    jUser.insert("Name", User.m_sName);
+//    jUser.insert("Surname", User.m_sSurname);
+//    jUser.insert("Patronymic", User.m_sPatronymic);
+//    jUser.insert("BirthDate", User.m_sBirthDate);
+//    jUser.insert("Profession", User.m_sProfession);
+//    jUser.insert("Description", User.m_sDescription);
 
 //    QJsonDocument jDocument;
 //    jDocument.setObject(jUser);

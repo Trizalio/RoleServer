@@ -24,14 +24,15 @@ PRIMARY KEY (`id`) \
 
 #define USER_STAT_UTF8_SCRIPT "ALTER TABLE `UserStats` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;"
 
-#define DEFAULT_AIR_SEC 900
-#define DEFAULT_STUN_SEC 300
+#define DEFAULT_AIR_SEC 7 * 60
+#define DEFAULT_STUN_SEC 3 * 60
 
 enum EUserStates
 {
     AlreadyDead,
     Died,
     Damaged,
+    Ok,
     Healed,
     HealedToCap,
     AlreadyFull

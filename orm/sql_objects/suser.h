@@ -6,25 +6,6 @@
 #include "cjsonserializable.h"
 
 #define USER_DROP_SCRIPT "DROP TABLE IF EXISTS `Users`;"
-//#define USER_CREATE_SCRIPT "CREATE TABLE `Users` ( \
-//`id` INTEGER NOT NULL AUTO_INCREMENT, \
-//`name` VARCHAR(50) NOT NULL, \
-//`surname` VARCHAR(50) NOT NULL, \
-//`patronymic` VARCHAR(50) NOT NULL, \
-//`birth_date` DATE NOT NULL, \
-//`profession` VARCHAR(50) NOT NULL, \
-//`description` MEDIUMTEXT NOT NULL, \
-//`deleted` TINYINT NOT NULL DEFAULT 0, \
-//`HpMax` INTEGER NOT NULL, \
-//`Hp` INTEGER NOT NULL, \
-//`MpMax` INTEGER NOT NULL, \
-//`Mp` INTEGER NOT NULL, \
-//`Air` INTEGER NULL DEFAULT NULL, \
-//`hash` VARCHAR NULL DEFAULT NULL, \
-//`action_hash` VARCHAR NULL DEFAULT NULL, \
-//PRIMARY KEY (`id`), \
-//KEY (`hash`) \
-//);"
 
 #define USER_CREATE_SCRIPT "CREATE TABLE `Users` ( \
 `id` INTEGER NOT NULL AUTO_INCREMENT, \
@@ -33,8 +14,8 @@
 `patronymic` VARCHAR(50) NOT NULL, \
 `male` TINYINT NOT NULL, \
 `birth_date` DATE NOT NULL, \
-`specialty` VARCHAR(50) NOT NULL, \
-`profession` VARCHAR(50) NOT NULL, \
+`specialty` VARCHAR(150) NOT NULL, \
+`profession` VARCHAR(150) NOT NULL, \
 `description` MEDIUMTEXT NOT NULL, \
 `hash` VARCHAR(4) NULL DEFAULT NULL, \
 `action_hash` VARCHAR(4) NULL DEFAULT NULL, \
@@ -54,40 +35,40 @@ struct SUser : public CJsonSerializable
 public:
     SUser();
 
-    SUser(std::string sName,
-            std::string sSurname,
-            std::string sPatronymic,
+    SUser(QString sName,
+            QString sPatronymic,
+            QString sSurname,
             bool bMale,
-            std::string sBirthDate,
-            std::string sSpecialty,
-            std::string sProfession,
-            std::string sDescription);
+            QString sBirthDate,
+            QString sSpecialty,
+            QString sProfession,
+            QString sDescription);
 
     SUser(int nId,
-            std::string sName,
-            std::string sSurname,
-            std::string sPatronymic,
+            QString sName,
+            QString sSurname,
+            QString sPatronymic,
             bool bMale,
-            std::string sBirthDate,
-            std::string sSpecialty,
-            std::string sProfession,
-            std::string sDescription);
+            QString sBirthDate,
+            QString sSpecialty,
+            QString sProfession,
+            QString sDescription);
 
     QJsonObject getJsonObject() override;
     static SUser getObjectFromJson(QByteArray jUser);
 
     int m_nId = 0;
 
-    std::string m_sName;
-    std::string m_sSurname;
-    std::string m_sPatronymic;
+    QString m_sName;
+    QString m_sSurname;
+    QString m_sPatronymic;
 
     bool m_bMale;
 
-    std::string m_sBirthDate;
-    std::string m_sSpecialty;
-    std::string m_sProfession;
-    std::string m_sDescription;
+    QString m_sBirthDate;
+    QString m_sSpecialty;
+    QString m_sProfession;
+    QString m_sDescription;
 };
 
 #endif // SUSER_H

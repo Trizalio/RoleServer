@@ -4,7 +4,7 @@
 
 SUser::SUser(){}
 
-SUser::SUser(std::string sName, std::string sSurname, std::string sPatronymic, bool bMale, std::string sBirthDate, std::string sSpecialty, std::string sProfession, std::string sDescription):
+SUser::SUser(QString sName, QString sPatronymic, QString sSurname, bool bMale, QString sBirthDate, QString sSpecialty, QString sProfession, QString sDescription):
     m_sName(sName),
     m_sSurname(sSurname),
     m_sPatronymic(sPatronymic),
@@ -17,7 +17,7 @@ SUser::SUser(std::string sName, std::string sSurname, std::string sPatronymic, b
     m_sDescription(sDescription)
 {}
 
-SUser::SUser(int nId, std::string sName, std::string sSurname, std::string sPatronymic, bool bMale, std::string sBirthDate, std::string sSpecialty, std::string sProfession, std::string sDescription):
+SUser::SUser(int nId, QString sName, QString sSurname, QString sPatronymic, bool bMale, QString sBirthDate, QString sSpecialty, QString sProfession, QString sDescription):
     m_nId(nId),
 
     m_sName(sName),
@@ -38,14 +38,14 @@ QJsonObject SUser::getJsonObject()
     QJsonObject jUser;
 
     jUser.insert("Id", m_nId);
-    jUser.insert("Name",m_sName.c_str());
-    jUser.insert("Surname",m_sSurname.c_str());
+    jUser.insert("Name",m_sName);
+    jUser.insert("Surname",m_sSurname);
     jUser.insert("Male",m_bMale);
-    jUser.insert("Patronymic",m_sPatronymic.c_str());
-    jUser.insert("BirthDate",m_sBirthDate.c_str());
-    jUser.insert("Specialty",m_sSpecialty.c_str());
-    jUser.insert("Profession",m_sProfession.c_str());
-    jUser.insert("Description",m_sDescription.c_str());
+    jUser.insert("Patronymic",m_sPatronymic);
+    jUser.insert("BirthDate",m_sBirthDate);
+    jUser.insert("Specialty",m_sSpecialty);
+    jUser.insert("Profession",m_sProfession);
+    jUser.insert("Description",m_sDescription);
 
 //    QJsonValue jId = jUser.take("Id");
 //    int nId = jId.toInt();
@@ -98,14 +98,14 @@ SUser SUser::getObjectFromJson(QByteArray jUser)
         qDebug() << "wrong type";
         return SUser();
     }
-    std::string sName = jName.toString().toStdString();
-    std::string sSurname = jSurname.toString().toStdString();
-    std::string sPatronymic = jPatronymic.toString().toStdString();
+    QString sName = jName.toString();
+    QString sSurname = jSurname.toString();
+    QString sPatronymic = jPatronymic.toString();
     bool bMale = jMale.toBool();
-    std::string sBirthDate = jBirthDate.toString("2080-01-01").toStdString();
-    std::string sSpecialty = jSpecialty.toString().toStdString();
-    std::string sProfession = jProfession.toString().toStdString();
-    std::string sDescription = jDescription.toString().toStdString();
+    QString sBirthDate = jBirthDate.toString("2080-01-01");
+    QString sSpecialty = jSpecialty.toString();
+    QString sProfession = jProfession.toString();
+    QString sDescription = jDescription.toString();
     if(jNewUser.contains("Id"))
     {
         QJsonValue jId = jNewUser.take("Id");

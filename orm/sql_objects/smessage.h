@@ -28,9 +28,9 @@ public:
     SMessage(int nId,
             int nSenderId,
             int nRecieverId,
-            std::string sTime,
-            std::string sSubject,
-            std::string sText,
+            QString sTime,
+            QString sSubject,
+            QString sText,
             bool bAnonymously):
         m_nId(nId),
         m_nSenderId(nSenderId),
@@ -42,9 +42,9 @@ public:
     {}
     SMessage(int nSenderId,
             int nRecieverId,
-            std::string sTime,
-            std::string sSubject,
-            std::string sText,
+            QString sTime,
+            QString sSubject,
+            QString sText,
             bool bAnonymously):
         m_nSenderId(nSenderId),
         m_nRecieverId(nRecieverId),
@@ -56,9 +56,9 @@ public:
     int m_nId = 0;
     int m_nSenderId;
     int m_nRecieverId;
-    std::string m_sTime;
-    std::string m_sSubject;
-    std::string m_sText;
+    QString m_sTime;
+    QString m_sSubject;
+    QString m_sText;
     bool m_bAnonymously;
 
 };

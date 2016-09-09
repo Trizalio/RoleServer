@@ -26,27 +26,27 @@ public:
         PUBLIC,
         LAB
     };
-    static std::string typeToString(eGroupType eType);
-    static eGroupType stringToType(std::string sType);
+    static QString typeToString(eGroupType eType);
+    static eGroupType stringToType(QString sType);
     SGroup();
 
     SGroup(int nId,
            int nParentId,
-           std::string sName,
-           std::string sDescription,
-           std::string sType);
+           QString sName,
+           QString sDescription,
+           QString sType);
 
     SGroup(int nParentId,
-           std::string sName,
-           std::string sDescription,
+           QString sName,
+           QString sDescription,
            eGroupType eGroupType);
 
     QJsonObject getJsonObject() override;
 
     int m_nId = 0;
     int m_nParentId = 0;
-    std::string m_sName;
-    std::string m_sDescription;
+    QString m_sName;
+    QString m_sDescription;
     eGroupType m_eType = HIDDEN;
 };
 

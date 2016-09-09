@@ -30,29 +30,29 @@ struct SPlayer : public CJsonSerializable
 {
 public:
     SPlayer();
-    SPlayer(std::string sName,
-            std::string sSurname,
-            std::string sPatronymic,
-            std::string sNick,
-            std::string sBirthDate,
-            std::string sQuenta,
+    SPlayer(QString sName,
+            QString sSurname,
+            QString sPatronymic,
+            QString sNick,
+            QString sBirthDate,
+            QString sQuenta,
             bool bAdmin);
     SPlayer(int nUserId,
-            std::string sName,
-            std::string sSurname,
-            std::string sPatronymic,
-            std::string sNick,
-            std::string sBirthDate,
-            std::string sQuenta,
+            QString sName,
+            QString sSurname,
+            QString sPatronymic,
+            QString sNick,
+            QString sBirthDate,
+            QString sQuenta,
             bool bAdmin);
     SPlayer(int nId,
             int nUserId,
-            std::string sName,
-            std::string sSurname,
-            std::string sPatronymic,
-            std::string sNick,
-            std::string sBirthDate,
-            std::string sQuenta,
+            QString sName,
+            QString sSurname,
+            QString sPatronymic,
+            QString sNick,
+            QString sBirthDate,
+            QString sQuenta,
             bool bAdmin);
 
     /// <-- Constructors
@@ -75,14 +75,14 @@ public:
     int m_nId = 0;
     int m_nUserId = 0;
 
-    std::string m_sName;
-    std::string m_sSurname;
-    std::string m_sPatronymic;
-    std::string m_sNick;
+    QString m_sName;
+    QString m_sSurname;
+    QString m_sPatronymic;
+    QString m_sNick;
 
-    std::string m_sBirthDate;
+    QString m_sBirthDate;
 
-    std::string m_sQuenta;
+    QString m_sQuenta;
 
     bool m_bAdmin = false;
 };
