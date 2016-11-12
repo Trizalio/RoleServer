@@ -57,6 +57,8 @@ private Q_SLOTS:
     void processBinaryMessage(QByteArray message);
     void socketDisconnected();
 
+    void closedServer();
+
 private:
 
     std::unordered_map<std::string, int> m_HashToPlayerId;

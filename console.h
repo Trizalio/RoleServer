@@ -27,9 +27,6 @@ private slots:
     void readCommand();
 };
 
-inline Console::Console()
-{
-    m_notifier = new QSocketNotifier(fileno(stdin), QSocketNotifier::Read, this);
-}
+
 
 #endif // CONSOLE_H

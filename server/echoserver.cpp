@@ -680,11 +680,25 @@ void EchoServer::processBinaryMessage(QByteArray message)
 void EchoServer::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    m_ConnectionToPlayerConnection.erase(pClient);
+    SConnection Connection;
+    if(m_ConnectionToPlayerConnection.count(pClient))
+    {
+        Connection = m_ConnectionToPlayerConnection[pClient];
+        m_ConnectionToPlayerConnection.erase(pClient);
+    }
+    if(Connection.m_nId)
+    {
+        m_PlayerIdToConnection.erase(Connection.m_nId);
+    }
     if (m_debug)
         qDebug() << "socketDisconnected:" << pClient;
     if (pClient) {
         m_clients.removeAll(pClient);
         pClient->deleteLater();
     }
+}
+
+void EchoServer::closedServer()
+{
+    qDebug() << __FUNCTION__;
 }

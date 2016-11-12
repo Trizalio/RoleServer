@@ -49,14 +49,14 @@ int main(int argc, char *argv[])
     EchoServer *server = new EchoServer(pOrm, nWebSocketPort, debug);
     QObject::connect(server, &EchoServer::closed, &a, &QCoreApplication::quit);
 
-    Console console;
-    console.run();
-    QObject::connect(&console, SIGNAL(quit()), &a, SLOT(quit()));
-    QObject::connect(&console, SIGNAL(send()), server, SLOT(send()));
-    QObject::connect(&console, SIGNAL(play()), server, SLOT(play()));
+//    Console console;
+//    console.run();
+//    QObject::connect(&console, SIGNAL(quit()), &a, SLOT(quit()));
+//    QObject::connect(&console, SIGNAL(send()), server, SLOT(send()));
+//    QObject::connect(&console, SIGNAL(play()), server, SLOT(play()));
 
-    CPlanetThread PlanetThread;
-    PlanetThread.start();
+//    CPlanetThread PlanetThread;
+//    PlanetThread.start();
 
     QTimer* pTimer = new QTimer();
     CTickManager* pTickManager =  new CTickManager(pOrm);
